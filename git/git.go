@@ -11,7 +11,7 @@ func IsGitRepo() bool {
 	return err == nil
 }
 
-func GetCurrentBranch() (string, error) {
+func CurrentBranch() (string, error) {
 	// Open the current repository in the current directory
 	repo, err := git.PlainOpen(".")
 	if err != nil {

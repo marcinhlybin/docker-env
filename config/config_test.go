@@ -55,7 +55,7 @@ aws_repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo
 
 func TestNewConfig_OverrideConfig(t *testing.T) {
 	configContent := `
-project: test-project
+project: test_project
 secrets:
   - secret1
   - secret2
@@ -68,7 +68,7 @@ aws_region: us-west-2
 aws_repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo
 `
 	overrideContent := `
-project: override-project
+project: override_project
 aws_region: us-east-1
 `
 	configPath := createTempConfigFile(t, configContent)

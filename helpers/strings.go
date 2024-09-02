@@ -13,3 +13,11 @@ func ToTitle(s string) string {
 	}
 	return strings.ToUpper(s[:1]) + s[1:]
 }
+
+func TrimToLastSlash(s string) string {
+	lastSlashIndex := strings.LastIndex(s, "/")
+	if lastSlashIndex == -1 {
+		return s // No slash found, return the original string
+	}
+	return s[lastSlashIndex+1:]
+}

@@ -13,12 +13,12 @@ var CleanupCommand = cli.Command{
 }
 
 func cleanupAction(c *cli.Context) error {
-	registry, err := initializeProjectRegistry(c)
+	reg, err := NewRegistry(c)
 	if err != nil {
 		return err
 	}
 
-	logger.SetPrefix(registry.Config().Project)
+	logger.SetPrefix(reg.Config().Project)
 
-	return registry.Cleanup()
+	return reg.Cleanup()
 }

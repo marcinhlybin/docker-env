@@ -1,6 +1,11 @@
-package helpers
+package helpers_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/marcinhlybin/docker-env/helpers"
+	"github.com/stretchr/testify/assert"
+)
 
 func TestToTitle(t *testing.T) {
 	tests := []struct {
@@ -27,10 +32,33 @@ func TestToTitle(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actual := ToTitle(test.input)
+			actual := helpers.ToTitle(test.input)
 			if actual != test.expected {
 				t.Errorf("expected %q, got %q", test.expected, actual)
 			}
+		})
+	}
+}
+
+func TestTrimToLastSlash(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"no slash", "path", "path"},
+		{"single slash", "path/", ""},
+		{"multiple slashes", "path/to/file", "file"},
+		{"trailing slash", "path/to/file/", ""},
+		{"empty string", "", ""},
+		{"only slash", "/", ""},
+		{"double slashes", "//", ""},
+	}
+
+	for _, test := range tests {
+		t.Run(test.input, func(t *testing.T) {
+			result := helpers.TrimToLastSlash(test.input)
+			assert.Equal(t, test.expected, result)
 		})
 	}
 }

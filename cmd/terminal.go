@@ -17,17 +17,30 @@ var TerminalCommand = cli.Command{
 			Aliases: []string{"s"},
 			Usage:   "start a single service",
 		},
+		&cli.StringFlag{
+			Name:    "cmd",
+			Aliases: []string{"c"},
+			Usage:   "run command in the terminal",
+		},
 	},
 	Action: terminalAction,
 }
 
 func terminalAction(c *cli.Context) error {
-	p, err := initializeProject(c)
+	p, err := NewProject(c)
+	if err != nil {
+		return err
+	}
+
+	println(p.String())
+	reg, err := NewRegistry(c)
 	if err != nil {
 		return err
 	}
 
 	logger.SetPrefix(p.Name)
 
-	return p.Terminal()
+	cmd := c.String("cmd")
+
+	return reg.Terminal(p, cmd)
 }

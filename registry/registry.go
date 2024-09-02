@@ -15,7 +15,7 @@ type DockerProjectRegistry struct {
 	dockerCmd *docker.DockerCmd
 }
 
-func NewDockerProjectRegistry(cfg *config.Config) project.ProjectRegistry {
+func NewDockerProjectRegistry(cfg *config.Config) *DockerProjectRegistry {
 	dc := docker.NewDockerCmd(cfg)
 
 	return &DockerProjectRegistry{
@@ -24,13 +24,13 @@ func NewDockerProjectRegistry(cfg *config.Config) project.ProjectRegistry {
 	}
 }
 
-func (registry *DockerProjectRegistry) Config() *config.Config {
-	return registry.config
+func (reg *DockerProjectRegistry) Config() *config.Config {
+	return reg.config
 }
 
-func (registry *DockerProjectRegistry) ProjectExists(p *project.Project) (bool, error) {
+func (reg *DockerProjectRegistry) ProjectExists(p *project.Project) (bool, error) {
 	includeStopped := true
-	projects, err := registry.fetchProjects(includeStopped)
+	projects, err := reg.fetchProjects(includeStopped)
 	if err != nil {
 		return false, err
 	}
@@ -44,27 +44,27 @@ func (registry *DockerProjectRegistry) ProjectExists(p *project.Project) (bool, 
 	return false, nil
 }
 
-func (registry *DockerProjectRegistry) StartProject(p *project.Project, recreate, update bool) error {
-	if err := registry.stopOtherActiveProjects(p); err != nil {
+func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, update bool) error {
+	if err := reg.stopOtherActiveProjects(p); err != nil {
 		return err
 	}
 
-	if registry.config.AwsLogin {
+	if reg.config.AwsLogin {
 		logger.Info("Logging into AWS registry")
-		if err := registry.dockerCmd.LoginAws(); err != nil {
+		if err := reg.dockerCmd.LoginAws(); err != nil {
 			return err
 		}
 	}
 
 	logger.Info("Starting", p.String())
-	dc := registry.dockerCmd.CreateAndStartProjectCommand(p, recreate, update)
+	dc := reg.dockerCmd.CreateAndStartProjectCommand(p, recreate, update)
 	return dc.Execute()
 }
 
-func (registry *DockerProjectRegistry) stopOtherActiveProjects(p *project.Project) error {
+func (reg *DockerProjectRegistry) stopOtherActiveProjects(p *project.Project) error {
 	logger.Info("Stopping other active projects")
 	includeStopped := false
-	activeProjects, err := registry.fetchProjects(includeStopped)
+	activeProjects, err := reg.fetchProjects(includeStopped)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func (registry *DockerProjectRegistry) stopOtherActiveProjects(p *project.Projec
 			continue
 		}
 		logger.Debug("Stopping %s", ap.String())
-		dc := registry.dockerCmd.StopProjectCommand(ap)
+		dc := reg.dockerCmd.StopProjectCommand(ap)
 		if err := dc.Execute(); err != nil {
 			logger.Warning(fmt.Sprintf("Could not stop %s", ap.String()), err)
 		}
@@ -83,10 +83,10 @@ func (registry *DockerProjectRegistry) stopOtherActiveProjects(p *project.Projec
 	return nil
 }
 
-func (registry *DockerProjectRegistry) StopProject(p *project.Project) error {
+func (reg *DockerProjectRegistry) StopProject(p *project.Project) error {
 	logger.Info("Stopping", p.String())
 
-	exists, err := registry.ProjectExists(p)
+	exists, err := reg.ProjectExists(p)
 	if err != nil {
 		return err
 	}
@@ -95,14 +95,14 @@ func (registry *DockerProjectRegistry) StopProject(p *project.Project) error {
 		return nil
 	}
 
-	dc := registry.dockerCmd.StopProjectCommand(p)
+	dc := reg.dockerCmd.StopProjectCommand(p)
 	return dc.Execute()
 }
 
-func (registry *DockerProjectRegistry) RestartProject(p *project.Project) error {
+func (reg *DockerProjectRegistry) RestartProject(p *project.Project) error {
 	logger.Info("Restarting", p.String())
 
-	exists, err := registry.ProjectExists(p)
+	exists, err := reg.ProjectExists(p)
 	if err != nil {
 		return err
 	}
@@ -112,14 +112,14 @@ func (registry *DockerProjectRegistry) RestartProject(p *project.Project) error 
 		return nil
 	}
 
-	dc := registry.dockerCmd.RestartProjectCommand(p)
+	dc := reg.dockerCmd.RestartProjectCommand(p)
 	return dc.Execute()
 }
 
-func (registry *DockerProjectRegistry) RemoveProject(p *project.Project) error {
+func (reg *DockerProjectRegistry) RemoveProject(p *project.Project) error {
 	logger.Info("Removing", p.String())
 
-	exists, err := registry.ProjectExists(p)
+	exists, err := reg.ProjectExists(p)
 	if err != nil {
 		return err
 	}
@@ -128,27 +128,27 @@ func (registry *DockerProjectRegistry) RemoveProject(p *project.Project) error {
 		return nil
 	}
 
-	dc := registry.dockerCmd.RemoveProjectCommand(p)
+	dc := reg.dockerCmd.RemoveProjectCommand(p)
 	return dc.Execute()
 }
 
-func (registry *DockerProjectRegistry) BuildProject(p *project.Project, noCache bool) error {
+func (reg *DockerProjectRegistry) BuildProject(p *project.Project, noCache bool) error {
 	logger.Info("Building", p.String())
-	dc := registry.dockerCmd.BuildProjectCommand(p, noCache)
+	dc := reg.dockerCmd.BuildProjectCommand(p, noCache)
 	return dc.Execute()
 }
 
-func (registry *DockerProjectRegistry) Cleanup() error {
+func (reg *DockerProjectRegistry) Cleanup() error {
 	logger.Info("Cleaning up")
 	includeStopped := true
-	projects, err := registry.fetchProjects(includeStopped)
+	projects, err := reg.fetchProjects(includeStopped)
 	if err != nil {
 		return err
 	}
 
 	isErr := false
 	for _, p := range projects {
-		dc := registry.dockerCmd.RemoveProjectCommand(p)
+		dc := reg.dockerCmd.RemoveProjectCommand(p)
 		err := dc.Execute()
 		if err != nil {
 			isErr = true
@@ -163,8 +163,18 @@ func (registry *DockerProjectRegistry) Cleanup() error {
 	return nil
 }
 
-func (registry *DockerProjectRegistry) RunTerminal(p *project.Project) error {
+func (reg *DockerProjectRegistry) Terminal(p *project.Project, cmd string) error {
 	logger.Info("Running terminal for", p.String())
-	dc := registry.dockerCmd.RunTerminalCommand(p, registry.config.TerminalCommand)
+
+	if !p.IsServiceDefined() {
+		p.SetServiceName(reg.config.TerminalService)
+	}
+
+	if cmd == "" {
+		cmd = reg.config.TerminalCommand
+	}
+
+	dc := reg.dockerCmd.TerminalCommand(p, cmd)
+
 	return dc.Execute()
 }

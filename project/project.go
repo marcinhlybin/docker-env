@@ -2,63 +2,67 @@ package project
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/marcinhlybin/docker-env/git"
+	"github.com/marcinhlybin/docker-env/helpers"
 	"github.com/marcinhlybin/docker-env/logger"
 )
 
 type Project struct {
 	Name        string
 	ServiceName string
-	registry    ProjectRegistry
 }
 
-func NewProject(projectName, serviceName string, registry ProjectRegistry) (*Project, error) {
+func NewProject(projectName, serviceName string) (*Project, error) {
 	logger.Debug("Creating project project_name='%s' service_name='%s'", projectName, serviceName)
 
-	projectName, err := resolveProjectName(projectName)
+	p := &Project{}
+
+	var err error
+	if projectName != "" {
+		p.SetProjectName(projectName)
+	} else {
+		p.SetProjectNameFromGitBranch()
+	}
 	if err != nil {
 		return nil, err
 	}
 
-	if err = validateProjectName(projectName); err != nil {
-		return nil, err
-
+	if serviceName != "" {
+		err = p.SetServiceName(serviceName)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	if err = validateServiceName(serviceName); err != nil {
-		return nil, err
-	}
-
-	return &Project{
-		Name:        projectName,
-		ServiceName: serviceName,
-		registry:    registry,
-	}, nil
+	return p, nil
 }
 
-func resolveProjectName(projectName string) (string, error) {
-	if projectName == "" {
-		return getProjectNameFromGitBranch()
+func (p *Project) SetProjectName(name string) error {
+	if err := validateProjectName(name); err != nil {
+		return err
 	}
-	return projectName, nil
+	p.Name = name
+	return nil
 }
 
-func getProjectNameFromGitBranch() (string, error) {
-	branch, err := git.GetCurrentBranch()
+func (p *Project) SetProjectNameFromGitBranch() error {
+	name, err := git.CurrentBranch()
 	if err != nil {
-		return "", fmt.Errorf("failed to get project name from git branch: %w", err)
+		return fmt.Errorf("failed to get project name from git branch: %w", err)
 	}
-	return trimAfterLastSlash(branch), nil
+	// Simplify project name
+	name = helpers.TrimToLastSlash(name)
+
+	return p.SetProjectName(name)
 }
 
-func trimAfterLastSlash(s string) string {
-	lastSlashIndex := strings.LastIndex(s, "/")
-	if lastSlashIndex == -1 {
-		return s // No slash found, return the original string
+func (p *Project) SetServiceName(name string) error {
+	if err := validateServiceName(name); err != nil {
+		return err
 	}
-	return s[lastSlashIndex+1:]
+	p.ServiceName = name
+	return nil
 }
 
 func (p *Project) IsServiceDefined() bool {
@@ -70,32 +74,4 @@ func (p *Project) String() string {
 		return fmt.Sprintf("service %s/%s", p.Name, p.ServiceName)
 	}
 	return fmt.Sprintf("project %s", p.Name)
-}
-
-func (p *Project) Start(recreate, update bool) error {
-	return p.registry.StartProject(p, recreate, update)
-}
-
-func (p *Project) Stop() error {
-	return p.registry.StopProject(p)
-}
-
-func (p *Project) Restart() error {
-	return p.registry.RestartProject(p)
-}
-
-func (p *Project) Remove() error {
-	return p.registry.RemoveProject(p)
-}
-
-func (p *Project) Build(noCache bool) error {
-	return p.registry.BuildProject(p, noCache)
-}
-
-func (p *Project) Exists() (bool, error) {
-	return p.registry.ProjectExists(p)
-}
-
-func (p *Project) Terminal() error {
-	return p.registry.RunTerminal(p)
 }

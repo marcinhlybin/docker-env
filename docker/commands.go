@@ -92,16 +92,11 @@ func (dc *DockerCmd) BuildProjectCommand(p *project.Project, noCache bool) *Dock
 	return dc
 }
 
-func (dc *DockerCmd) RunTerminalCommand(p *project.Project, cmd string) *DockerCmd {
+func (dc *DockerCmd) TerminalCommand(p *project.Project, cmd string) *DockerCmd {
 	dc.DockerComposeCommand()
 	dc.WithProjectName(p)
 
-	if p.IsServiceDefined() {
-		dc.WithArgs("exec", "-it", p.ServiceName)
-	} else {
-		dc.WithArgs("run", "-it", "--rm")
-	}
-
+	dc.WithArgs("exec", "-it", p.ServiceName)
 	dc.WithArgs(cmd)
 
 	return dc

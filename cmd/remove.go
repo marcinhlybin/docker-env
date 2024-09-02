@@ -22,12 +22,17 @@ If environment name is not specified current branch name is used.`,
 }
 
 func removeAction(c *cli.Context) error {
-	p, err := initializeProject(c)
+	p, err := NewProject(c)
+	if err != nil {
+		return err
+	}
+
+	reg, err := NewRegistry(c)
 	if err != nil {
 		return err
 	}
 
 	logger.SetPrefix(p.Name)
 
-	return p.Remove()
+	return reg.RemoveProject(p)
 }

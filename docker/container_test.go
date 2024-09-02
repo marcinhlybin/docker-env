@@ -6,7 +6,7 @@ import (
 	"github.com/marcinhlybin/docker-env/docker"
 )
 
-func TestGetProjectName(t *testing.T) {
+func TestProjectName(t *testing.T) {
 	container := docker.Container{
 		Labels: "com.docker.compose.project=stackname-projectname",
 		Name:   "stackname-projectname",
@@ -20,7 +20,7 @@ func TestGetProjectName(t *testing.T) {
 	}
 }
 
-func TestGetComposeProjectName(t *testing.T) {
+func TestComposeProjectName(t *testing.T) {
 	container := docker.Container{
 		Labels: "com.docker.compose.project=stackname-projectname",
 	}
@@ -33,7 +33,7 @@ func TestGetComposeProjectName(t *testing.T) {
 	}
 }
 
-func TestGetServiceName(t *testing.T) {
+func TestServiceName(t *testing.T) {
 	container := docker.Container{
 		Labels: "com.docker.compose.project=stackname-projectname",
 		Name:   "stackname-projectname-servicename",
@@ -47,7 +47,7 @@ func TestGetServiceName(t *testing.T) {
 	}
 }
 
-func TestGetLabelValue(t *testing.T) {
+func TestLabelValue(t *testing.T) {
 	container := docker.Container{
 		Labels: "com.docker.another.value=value,com.docker.compose.project=stackname-projectname,another.label=value",
 	}

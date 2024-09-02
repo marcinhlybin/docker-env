@@ -14,6 +14,7 @@ var (
 	DefaultComposeFile        = "docker-compose.yml"
 	DefaultComposeProfile     = "app"
 	DefaultTerminalCommand    = "/bin/bash"
+	DefaultTerminalService    = "app"
 )
 
 type Config struct {
@@ -23,6 +24,7 @@ type Config struct {
 	ComposeFile     string   `yaml:"compose_file"`
 	ComposeProfile  string   `yaml:"compose_profile"`
 	TerminalCommand string   `yaml:"terminal_command"`
+	TerminalService string   `yaml:"terminal_service"`
 	AwsLogin        bool     `yaml:"aws_login"`
 	AwsRegion       string   `yaml:"aws_region"`
 	AwsRepository   string   `yaml:"aws_repository"`
@@ -84,6 +86,9 @@ func setDefaults(cfg *Config) {
 	}
 	if cfg.TerminalCommand == "" {
 		cfg.TerminalCommand = DefaultTerminalCommand
+	}
+	if cfg.TerminalService == "" {
+		cfg.TerminalService = DefaultTerminalService
 	}
 }
 

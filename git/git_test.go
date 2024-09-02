@@ -64,7 +64,7 @@ func TestIsGitRepo(t *testing.T) {
 	}
 }
 
-func TestGetCurrentBranch(t *testing.T) {
+func TestCurrentBranch(t *testing.T) {
 	tempDir, cleanup := setupTestRepo(t)
 	defer cleanup()
 
@@ -79,7 +79,7 @@ func TestGetCurrentBranch(t *testing.T) {
 		t.Fatalf("Failed to change directory: %v", err)
 	}
 
-	branchName, err := GetCurrentBranch()
+	branchName, err := CurrentBranch()
 	if err != nil {
 		t.Fatalf("Failed to get current branch: %v", err)
 	}

@@ -12,7 +12,7 @@ var InfoCommand = cli.Command{
 }
 
 func infoAction(c *cli.Context) error {
-	cfg, err := initializeConfig(c)
+	cfg, err := NewConfig(c)
 	if err != nil {
 		return err
 	}

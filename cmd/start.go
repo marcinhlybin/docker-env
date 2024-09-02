@@ -33,7 +33,12 @@ If project does not exist it will be created.`,
 }
 
 func startAction(c *cli.Context) error {
-	p, err := initializeProject(c)
+	p, err := NewProject(c)
+	if err != nil {
+		return err
+	}
+
+	reg, err := NewRegistry(c)
 	if err != nil {
 		return err
 	}
@@ -43,5 +48,5 @@ func startAction(c *cli.Context) error {
 
 	logger.SetPrefix(p.Name)
 
-	return p.Start(recreate, update)
+	return reg.StartProject(p, recreate, update)
 }

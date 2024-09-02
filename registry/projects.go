@@ -45,7 +45,7 @@ func (registry *DockerProjectRegistry) createProjectsFromNames(names []string) (
 	for _, name := range names {
 		name = registry.trimComposeProjectNamePrefix(name)
 
-		p, err := project.NewProject(name, "", registry)
+		p, err := project.NewProject(name, "")
 		if err != nil {
 			logger.Warning("Skipping %s due to error: %v", name, err)
 			continue

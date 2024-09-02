@@ -21,7 +21,7 @@ var ListCommand = cli.Command{
 }
 
 func listAction(c *cli.Context) error {
-	registry, err := initializeProjectRegistry(c)
+	reg, err := NewRegistry(c)
 	if err != nil {
 		return err
 	}
@@ -30,5 +30,5 @@ func listAction(c *cli.Context) error {
 
 	logger.ShowCommands(false)
 
-	return registry.ListProjects(verbose)
+	return reg.ListProjects(verbose)
 }
