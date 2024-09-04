@@ -5,12 +5,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var RestartCommand = cli.Command{
-	Name:    "restart",
-	Aliases: []string{"r", "reboot"},
-	Usage:   "Restart docker containers",
-	Description: `Restart docker containers.
-If environment name is not specified current branch name is used.`,
+var CodeCommand = cli.Command{
+	Name:      "code",
+	Aliases:   []string{"open"},
+	ArgsUsage: "[DIR]",
+	Usage:     "Open code editor",
+	Description: `Open code editor for the project and attach to the container.
+Directory is optional. By default it will open the / directory.`,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "project",
@@ -20,15 +21,13 @@ If environment name is not specified current branch name is used.`,
 		&cli.StringFlag{
 			Name:    "service",
 			Aliases: []string{"s"},
-			Usage:   "restart a single service",
+			Usage:   "start a single service",
 		},
 	},
-	Action: restartAction,
+	Action: codeAction,
 }
 
-func restartAction(c *cli.Context) error {
-	ExitWithErrorOnArgs(c)
-
+func codeAction(c *cli.Context) error {
 	p, err := NewProject(c)
 	if err != nil {
 		return err
@@ -41,5 +40,7 @@ func restartAction(c *cli.Context) error {
 
 	logger.SetPrefix(p.Name)
 
-	return reg.RestartProject(p)
+	dir := c.Args().First()
+
+	return reg.Code(p, dir)
 }

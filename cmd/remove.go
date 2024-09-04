@@ -6,12 +6,17 @@ import (
 )
 
 var RemoveCommand = cli.Command{
-	Name:      "remove",
-	Usage:     "Remove docker containers",
-	ArgsUsage: "[PROJECT_NAME]",
+	Name:    "remove",
+	Aliases: []string{"rm", "delete"},
+	Usage:   "Remove docker containers",
 	Description: `Remove docker containers.
 If environment name is not specified current branch name is used.`,
 	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:    "project",
+			Aliases: []string{"p"},
+			Usage:   "set a project name",
+		},
 		&cli.StringFlag{
 			Name:    "service",
 			Aliases: []string{"s"},
@@ -22,6 +27,8 @@ If environment name is not specified current branch name is used.`,
 }
 
 func removeAction(c *cli.Context) error {
+	ExitWithErrorOnArgs(c)
+
 	p, err := NewProject(c)
 	if err != nil {
 		return err

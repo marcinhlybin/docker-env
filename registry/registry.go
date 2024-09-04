@@ -166,15 +166,43 @@ func (reg *DockerProjectRegistry) Cleanup() error {
 func (reg *DockerProjectRegistry) Terminal(p *project.Project, cmd string) error {
 	logger.Info("Running terminal for", p.String())
 
+	// Set default service
 	if !p.IsServiceDefined() {
-		p.SetServiceName(reg.config.TerminalService)
+		p.SetServiceName(reg.config.TerminalDefaultService)
 	}
 
+	// Set default directory
 	if cmd == "" {
-		cmd = reg.config.TerminalCommand
+		cmd = reg.config.TerminalDefaultCommand
 	}
 
 	dc := reg.dockerCmd.TerminalCommand(p, cmd)
 
 	return dc.Execute()
+}
+
+func (reg *DockerProjectRegistry) Code(p *project.Project, dir string) error {
+	logger.Info("Opening code editor for", p.String())
+
+	// Set default service
+	if !p.IsServiceDefined() {
+		logger.Debug("Setting default service name")
+		p.SetServiceName(reg.config.VscodeDefaultService)
+	}
+
+	// Set default directory
+	if dir == "" {
+		dir = reg.config.VscodeDefaultDir
+	}
+
+	container, err := reg.ServiceContainer(p)
+	if err != nil {
+		return err
+	}
+	if container == nil {
+		logger.Warning("%s not found", helpers.ToTitle(p.String()))
+		return nil
+	}
+
+	return reg.dockerCmd.OpenCode(container, dir)
 }

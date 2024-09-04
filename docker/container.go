@@ -5,6 +5,7 @@ import (
 )
 
 type Container struct {
+	Id        string `json:"ID"`
 	CreatedAt string `json:"CreatedAt"`
 	Name      string `json:"Names"`
 	State     string `json:"State"`
@@ -23,8 +24,8 @@ func (c *Container) ComposeProjectName() string {
 }
 
 func (c *Container) ServiceName() string {
-	projectName := c.LabelValue("com.docker.compose.project")
-	return strings.TrimPrefix(c.Name, projectName+"-")
+	composeProject := c.LabelValue("com.docker.compose.project")
+	return strings.TrimPrefix(c.Name, composeProject+"-")
 
 }
 

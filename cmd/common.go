@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/marcinhlybin/docker-env/config"
 	"github.com/marcinhlybin/docker-env/project"
 	"github.com/marcinhlybin/docker-env/registry"
@@ -9,7 +11,7 @@ import (
 
 func NewProject(c *cli.Context) (*project.Project, error) {
 	// Read project arguments
-	projectName := c.Args().First()
+	projectName := c.String("project")
 	serviceName := c.String("service")
 
 	return project.NewProject(projectName, serviceName)
@@ -26,4 +28,11 @@ func NewRegistry(c *cli.Context) (*registry.DockerProjectRegistry, error) {
 
 func NewConfig(c *cli.Context) (*config.Config, error) {
 	return config.NewConfig(c.String("config"))
+}
+
+func ExitWithErrorOnArgs(c *cli.Context) {
+	if c.Args().Present() {
+		cli.ShowSubcommandHelp(c)
+		os.Exit(1)
+	}
 }

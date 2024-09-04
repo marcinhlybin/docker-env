@@ -8,26 +8,31 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Defaults for the config
 var (
-	DefaultConfigPath         = ".docker-env/config.yaml"
-	DefaultOverrideConfigPath = ".docker-env/config.override.yaml"
-	DefaultComposeFile        = "docker-compose.yml"
-	DefaultComposeProfile     = "app"
-	DefaultTerminalCommand    = "/bin/bash"
-	DefaultTerminalService    = "app"
+	DefaultConfigPath             = ".docker-env/config.yaml"
+	DefaultOverrideConfigPath     = ".docker-env/config.override.yaml"
+	DefaultComposeFile            = "docker-compose.yml"
+	DefaultComposeProfile         = "app"
+	DefaultTerminalDefaultService = "app"
+	DefaultTerminalDefaultCommand = "/bin/bash"
+	DefaultVscodeDefaultService   = "app"
+	DefaultVscodeDefaultDir       = "/"
 )
 
 type Config struct {
-	Project         string   `yaml:"project"`
-	Secrets         []string `yaml:"secrets"`
-	EnvFiles        []string `yaml:"env_files"`
-	ComposeFile     string   `yaml:"compose_file"`
-	ComposeProfile  string   `yaml:"compose_profile"`
-	TerminalCommand string   `yaml:"terminal_command"`
-	TerminalService string   `yaml:"terminal_service"`
-	AwsLogin        bool     `yaml:"aws_login"`
-	AwsRegion       string   `yaml:"aws_region"`
-	AwsRepository   string   `yaml:"aws_repository"`
+	Project                string   `yaml:"project"`
+	Secrets                []string `yaml:"secrets"`
+	EnvFiles               []string `yaml:"env_files"`
+	ComposeFile            string   `yaml:"compose_file"`
+	ComposeProfile         string   `yaml:"compose_profile"`
+	TerminalDefaultService string   `yaml:"terminal_default_service"`
+	TerminalDefaultCommand string   `yaml:"terminal_default_command"`
+	VscodeDefaultService   string   `yaml:"vscode_default_service"`
+	VscodeDefaultDir       string   `yaml:"vscode_default_dir"`
+	AwsLogin               bool     `yaml:"aws_login"`
+	AwsRegion              string   `yaml:"aws_region"`
+	AwsRepository          string   `yaml:"aws_repository"`
 }
 
 // Read and parse the config file with fields validation
@@ -84,11 +89,17 @@ func setDefaults(cfg *Config) {
 	if cfg.ComposeProfile == "" {
 		cfg.ComposeProfile = DefaultComposeProfile
 	}
-	if cfg.TerminalCommand == "" {
-		cfg.TerminalCommand = DefaultTerminalCommand
+	if cfg.TerminalDefaultService == "" {
+		cfg.TerminalDefaultService = DefaultTerminalDefaultService
 	}
-	if cfg.TerminalService == "" {
-		cfg.TerminalService = DefaultTerminalService
+	if cfg.TerminalDefaultCommand == "" {
+		cfg.TerminalDefaultCommand = DefaultTerminalDefaultCommand
+	}
+	if cfg.VscodeDefaultService == "" {
+		cfg.VscodeDefaultService = DefaultVscodeDefaultService
+	}
+	if cfg.VscodeDefaultDir == "" {
+		cfg.VscodeDefaultDir = DefaultVscodeDefaultDir
 	}
 }
 
@@ -98,7 +109,10 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("Env files:", strings.Join(c.EnvFiles, ", "))
 	fmt.Println("Compose file:", c.ComposeFile)
 	fmt.Println("Compose profile:", c.ComposeProfile)
-	fmt.Println("Terminal command:", c.TerminalCommand)
+	fmt.Println("Terminal default service:", c.TerminalDefaultService)
+	fmt.Println("Terminal default command:", c.TerminalDefaultCommand)
+	fmt.Println("VSCode default service:", c.VscodeDefaultService)
+	fmt.Println("VSCode default directory:", c.VscodeDefaultDir)
 	fmt.Println("AWS login:", c.AwsLogin)
 	fmt.Println("AWS region:", c.AwsRegion)
 	fmt.Println("AWS repository:", c.AwsRepository)

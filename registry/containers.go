@@ -10,6 +10,7 @@ import (
 	"github.com/marcinhlybin/docker-env/docker"
 	"github.com/marcinhlybin/docker-env/helpers"
 	"github.com/marcinhlybin/docker-env/logger"
+	"github.com/marcinhlybin/docker-env/project"
 )
 
 // Table options
@@ -21,8 +22,23 @@ const (
 	flags    uint = 0
 )
 
-func (registry *DockerProjectRegistry) ListContainers() error {
-	containers, err := registry.fetchContainers()
+func (reg *DockerProjectRegistry) ServiceContainer(p *project.Project) (*docker.Container, error) {
+	containers, err := reg.fetchProjectContainers(p)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, c := range containers {
+		if c.ServiceName() == p.ServiceName {
+			return &c, nil
+		}
+	}
+
+	return nil, nil
+}
+
+func (reg *DockerProjectRegistry) ListContainers() error {
+	containers, err := reg.fetchAllContainers()
 	if err != nil {
 		return err
 	}
@@ -58,18 +74,33 @@ func (registry *DockerProjectRegistry) ListContainers() error {
 	return nil
 }
 
-func (registry *DockerProjectRegistry) fetchContainers() ([]docker.Container, error) {
-	logger.Debug("Fetching container names")
-	dc := registry.dockerCmd.FetchContainersCommand()
+func (reg *DockerProjectRegistry) fetchAllContainers() ([]docker.Container, error) {
+	logger.Debug("Fetching all containers")
+	return reg.fetchContainers(nil)
+}
+
+func (reg *DockerProjectRegistry) fetchProjectContainers(p *project.Project) ([]docker.Container, error) {
+	logger.Debug("Fetching container names for %s", p.Name)
+	return reg.fetchContainers(p)
+}
+
+func (reg *DockerProjectRegistry) fetchContainers(p *project.Project) ([]docker.Container, error) {
+	var dc *docker.DockerCmd
+	if p != nil {
+		dc = reg.dockerCmd.FetchProjectContainersCommand(p)
+	} else {
+		dc = reg.dockerCmd.FetchAllContainersCommand()
+	}
+
 	jsonRecords, err := dc.ExecuteWithOutput()
 	if err != nil {
 		return nil, err
 	}
 
-	return registry.createContainersFromJson(jsonRecords)
+	return reg.createContainersFromJson(jsonRecords)
 }
 
-func (registry *DockerProjectRegistry) createContainersFromJson(jsonRecords []string) ([]docker.Container, error) {
+func (reg *DockerProjectRegistry) createContainersFromJson(jsonRecords []string) ([]docker.Container, error) {
 	var containers []docker.Container
 
 	for _, jsonRecord := range jsonRecords {

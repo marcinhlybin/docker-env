@@ -1,6 +1,8 @@
 package docker
 
-import "github.com/marcinhlybin/docker-env/project"
+import (
+	"github.com/marcinhlybin/docker-env/project"
+)
 
 func (dc *DockerCmd) CreateAndStartProjectCommand(p *project.Project, recreate, update bool) *DockerCmd {
 	dc.DockerComposeCommand()
@@ -68,11 +70,24 @@ func (dc *DockerCmd) FetchProjectsCommand(includeStopped bool) *DockerCmd {
 	return dc
 }
 
-func (dc *DockerCmd) FetchContainersCommand() *DockerCmd {
-	dc.DockerCommand()
-	dc.WithArgs("ps", "-a", "--format", "json")
-	dc.WithProjectFilter()
+func (dc *DockerCmd) FetchProjectContainersCommand(p *project.Project) *DockerCmd {
+	dc.DockerComposeCommand()
+	dc.WithProjectName(p)
+	dc.WithArgs("ps", "-a", "--no-trunc", "--format", "json")
+	return dc
+}
 
+// FetchAllContainersCommand uses docker ps command (not docker compose) to fetch containers
+// Filtering is done by project prefix which must be a part of container name to make it work
+// Docker compose configuration must define container name as:
+// container_name: $COMPOSE_PROJECT_NAME-service_name_here
+//
+// It is not possible to list all containers using docker compose command
+// because --project-name argument is mandatory
+func (dc *DockerCmd) FetchAllContainersCommand() *DockerCmd {
+	dc.DockerCommand()
+	dc.WithArgs("ps", "-a", "--no-trunc", "--format", "json")
+	dc.WithProjectFilter()
 	return dc
 }
 

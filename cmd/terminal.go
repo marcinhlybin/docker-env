@@ -8,19 +8,19 @@ import (
 var TerminalCommand = cli.Command{
 	Name:        "terminal",
 	Aliases:     []string{"term", "shell", "ssh"},
+	ArgsUsage:   "[COMMAND]",
 	Usage:       "Run terminal",
-	ArgsUsage:   "[PROJECT_NAME]",
 	Description: `Run terminal in the project.`,
 	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:    "project",
+			Aliases: []string{"p"},
+			Usage:   "set a project name",
+		},
 		&cli.StringFlag{
 			Name:    "service",
 			Aliases: []string{"s"},
 			Usage:   "start a single service",
-		},
-		&cli.StringFlag{
-			Name:    "cmd",
-			Aliases: []string{"c"},
-			Usage:   "run command in the terminal",
 		},
 	},
 	Action: terminalAction,
@@ -32,7 +32,6 @@ func terminalAction(c *cli.Context) error {
 		return err
 	}
 
-	println(p.String())
 	reg, err := NewRegistry(c)
 	if err != nil {
 		return err
@@ -40,7 +39,7 @@ func terminalAction(c *cli.Context) error {
 
 	logger.SetPrefix(p.Name)
 
-	cmd := c.String("cmd")
+	cmd := c.Args().First()
 
 	return reg.Terminal(p, cmd)
 }

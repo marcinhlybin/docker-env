@@ -13,6 +13,8 @@ var CleanupCommand = cli.Command{
 }
 
 func cleanupAction(c *cli.Context) error {
+	ExitWithErrorOnArgs(c)
+
 	reg, err := NewRegistry(c)
 	if err != nil {
 		return err

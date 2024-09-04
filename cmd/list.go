@@ -1,14 +1,16 @@
 package cmd
 
 import (
-	"github.com/marcinhlybin/docker-env/logger"
+	"os"
+	"strings"
+
 	"github.com/urfave/cli/v2"
 )
 
 var ListCommand = cli.Command{
 	Name:        "ls",
-	Usage:       "list projects",
-	ArgsUsage:   "[PROJECT_NAME]",
+	Aliases:     []string{"list", "l", "ll"},
+	Usage:       "List projects. Use 'll' to show containers.",
 	Description: `List docker projects and containers.`,
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
@@ -21,14 +23,24 @@ var ListCommand = cli.Command{
 }
 
 func listAction(c *cli.Context) error {
+	ExitWithErrorOnArgs(c)
+
 	reg, err := NewRegistry(c)
 	if err != nil {
 		return err
 	}
 
-	verbose := c.Bool("verbose")
-
-	logger.ShowCommands(false)
+	verbose := c.Bool("verbose") || isAliasUsed("ll")
+	// logger.ShowCommands(false)
 
 	return reg.ListProjects(verbose)
+}
+
+func isAliasUsed(alias string) bool {
+	for _, arg := range os.Args {
+		if strings.Contains(arg, alias) {
+			return true
+		}
+	}
+	return false
 }

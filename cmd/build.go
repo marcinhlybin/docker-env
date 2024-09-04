@@ -5,12 +5,17 @@ import (
 )
 
 var BuildCommand = cli.Command{
-	Name:      "build",
-	Usage:     "Build docker images",
-	ArgsUsage: "[PROJECT_NAME]",
+	Name:    "build",
+	Aliases: []string{"b"},
+	Usage:   "Build docker images",
 	Description: `Build docker images.
 If environment name is not specified current branch name is used.`,
 	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:    "project",
+			Aliases: []string{"p"},
+			Usage:   "set a project name",
+		},
 		&cli.StringFlag{
 			Name:    "service",
 			Aliases: []string{"s"},
@@ -25,6 +30,8 @@ If environment name is not specified current branch name is used.`,
 }
 
 func buildAction(c *cli.Context) error {
+	ExitWithErrorOnArgs(c)
+
 	p, err := NewProject(c)
 	if err != nil {
 		return err

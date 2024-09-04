@@ -6,13 +6,18 @@ import (
 )
 
 var StartCommand = cli.Command{
-	Name:      "start",
-	Usage:     "Start docker containers",
-	ArgsUsage: "[PROJECT_NAME]",
+	Name:    "start",
+	Aliases: []string{"s", "up"},
+	Usage:   "Start docker containers",
 	Description: `Start docker containers.
 If project name is not specified, current branch name is used.
 If project does not exist it will be created.`,
 	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:    "project",
+			Aliases: []string{"p"},
+			Usage:   "set a project name",
+		},
 		&cli.StringFlag{
 			Name:    "service",
 			Aliases: []string{"s"},
@@ -33,6 +38,8 @@ If project does not exist it will be created.`,
 }
 
 func startAction(c *cli.Context) error {
+	ExitWithErrorOnArgs(c)
+
 	p, err := NewProject(c)
 	if err != nil {
 		return err
