@@ -33,7 +33,7 @@ secrets:
 env_files:
   - .env
 compose_file: docker-compose.yml
-compose_profile: app
+compose_default_profile: app
 aws_login: true
 aws_region: us-west-2
 aws_repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo
@@ -47,7 +47,7 @@ aws_repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo
 	assert.Equal(t, []string{"secret1", "secret2"}, cfg.Secrets)
 	assert.Equal(t, []string{".env"}, cfg.EnvFiles)
 	assert.Equal(t, "docker-compose.yml", cfg.ComposeFile)
-	assert.Equal(t, "app", cfg.ComposeProfile)
+	assert.Equal(t, "app", cfg.ComposeDefaultProfile)
 	assert.True(t, cfg.AwsLogin)
 	assert.Equal(t, "us-west-2", cfg.AwsRegion)
 	assert.Equal(t, "123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo", cfg.AwsRepository)
@@ -62,7 +62,7 @@ secrets:
 env_files:
   - .env
 compose_file: docker-compose.yml
-compose_profile: app
+compose_default_profile: app
 aws_login: true
 aws_region: us-west-2
 aws_repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo

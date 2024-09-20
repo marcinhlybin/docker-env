@@ -11,10 +11,10 @@ func SetupDockerCompose(t *testing.T) *docker.DockerCmd {
 	t.Helper() // mark as helper function
 
 	cfg := &config.Config{
-		ComposeFile:    "docker-compose.yml",
-		ComposeProfile: "default",
-		EnvFiles:       []string{"env1", "env2"},
-		Project:        "project",
+		ComposeFile:           "docker-compose.yml",
+		ComposeDefaultProfile: "default",
+		EnvFiles:              []string{"env1", "env2"},
+		Project:               "project",
 	}
 
 	return docker.NewDockerCmd(cfg)

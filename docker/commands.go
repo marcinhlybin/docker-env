@@ -24,6 +24,7 @@ func (dc *DockerCmd) CreateAndStartProjectCommand(p *project.Project, recreate, 
 
 func (dc *DockerCmd) StopProjectCommand(p *project.Project) *DockerCmd {
 	dc.DockerComposeCommand()
+	dc.WithSidecarProfile()
 	dc.WithProjectName(p)
 	dc.WithArgs("stop")
 
@@ -36,6 +37,7 @@ func (dc *DockerCmd) StopProjectCommand(p *project.Project) *DockerCmd {
 
 func (dc *DockerCmd) RestartProjectCommand(p *project.Project) *DockerCmd {
 	dc.DockerComposeCommand()
+	dc.WithSidecarProfile()
 	dc.WithProjectName(p)
 	dc.WithArgs("restart")
 
@@ -48,6 +50,7 @@ func (dc *DockerCmd) RestartProjectCommand(p *project.Project) *DockerCmd {
 
 func (dc *DockerCmd) RemoveProjectCommand(p *project.Project) *DockerCmd {
 	dc.DockerComposeCommand()
+	dc.WithSidecarProfile()
 	dc.WithProjectName(p)
 	dc.WithArgs("down", "--volumes")
 
@@ -60,7 +63,7 @@ func (dc *DockerCmd) RemoveProjectCommand(p *project.Project) *DockerCmd {
 
 func (dc *DockerCmd) FetchProjectsCommand(includeStopped bool) *DockerCmd {
 	dc.DockerComposeCommand()
-	dc.WithArgs("ls", "-q")
+	dc.WithArgs("ls", "--format", "json")
 	dc.WithProjectFilter()
 
 	if includeStopped {

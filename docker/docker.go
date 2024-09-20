@@ -36,7 +36,7 @@ func (dc *DockerCmd) DockerComposeCommand() *DockerCmd {
 	dc.Args = []string{
 		"compose",
 		"--file", dc.Config.ComposeFile,
-		"--profile", dc.Config.ComposeProfile,
+		"--profile", dc.Config.ComposeDefaultProfile,
 		"--progress", "tty"}
 
 	for _, envFile := range dc.Config.EnvFiles {
@@ -62,6 +62,11 @@ func (dc *DockerCmd) WithArgs(args ...string) *DockerCmd {
 func (dc *DockerCmd) WithProjectName(p *project.Project) *DockerCmd {
 	projectName := dc.Config.Project + "-" + p.Name
 	dc.Args = append(dc.Args, "--project-name", projectName)
+	return dc
+}
+
+func (dc *DockerCmd) WithSidecarProfile() *DockerCmd {
+	dc.Args = append(dc.Args, "--profile", dc.Config.ComposeSidecarProfile)
 	return dc
 }
 

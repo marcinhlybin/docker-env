@@ -13,7 +13,8 @@ var (
 	DefaultConfigPath             = ".docker-env/config.yaml"
 	DefaultOverrideConfigPath     = ".docker-env/config.override.yaml"
 	DefaultComposeFile            = "docker-compose.yml"
-	DefaultComposeProfile         = "app"
+	DefaultComposeDefaultProfile  = "app"
+	DefaultComposeSidecarProfile  = "sidecar"
 	DefaultTerminalDefaultService = "app"
 	DefaultTerminalDefaultCommand = "/bin/bash"
 	DefaultVscodeDefaultService   = "app"
@@ -25,7 +26,8 @@ type Config struct {
 	Secrets                []string `yaml:"secrets"`
 	EnvFiles               []string `yaml:"env_files"`
 	ComposeFile            string   `yaml:"compose_file"`
-	ComposeProfile         string   `yaml:"compose_profile"`
+	ComposeDefaultProfile  string   `yaml:"compose_default_profile"`
+	ComposeSidecarProfile  string   `yaml:"compose_sidecar_profile"`
 	TerminalDefaultService string   `yaml:"terminal_default_service"`
 	TerminalDefaultCommand string   `yaml:"terminal_default_command"`
 	VscodeDefaultService   string   `yaml:"vscode_default_service"`
@@ -86,8 +88,11 @@ func setDefaults(cfg *Config) {
 	if cfg.ComposeFile == "" {
 		cfg.ComposeFile = DefaultComposeFile
 	}
-	if cfg.ComposeProfile == "" {
-		cfg.ComposeProfile = DefaultComposeProfile
+	if cfg.ComposeDefaultProfile == "" {
+		cfg.ComposeDefaultProfile = DefaultComposeDefaultProfile
+	}
+	if cfg.ComposeSidecarProfile == "" {
+		cfg.ComposeSidecarProfile = DefaultComposeSidecarProfile
 	}
 	if cfg.TerminalDefaultService == "" {
 		cfg.TerminalDefaultService = DefaultTerminalDefaultService
@@ -107,8 +112,11 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("Project name:", c.Project)
 	fmt.Println("Mandatory secrets:", strings.Join(c.Secrets, ", "))
 	fmt.Println("Env files:", strings.Join(c.EnvFiles, ", "))
+	fmt.Println()
 	fmt.Println("Compose file:", c.ComposeFile)
-	fmt.Println("Compose profile:", c.ComposeProfile)
+	fmt.Println("Compose default profile:", c.ComposeDefaultProfile)
+	fmt.Println("Compose sidecar profile:", c.ComposeSidecarProfile)
+	fmt.Println()
 	fmt.Println("Terminal default service:", c.TerminalDefaultService)
 	fmt.Println("Terminal default command:", c.TerminalDefaultCommand)
 	fmt.Println("VSCode default service:", c.VscodeDefaultService)

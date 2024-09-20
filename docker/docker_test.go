@@ -11,10 +11,10 @@ import (
 
 func TestNewDockerCmd(t *testing.T) {
 	cfg := &config.Config{
-		ComposeFile:    "docker-compose.yml",
-		ComposeProfile: "dev",
-		EnvFiles:       []string{"env1", "env2"},
-		Project:        "myproject",
+		ComposeFile:           "docker-compose.yml",
+		ComposeDefaultProfile: "dev",
+		EnvFiles:              []string{"env1", "env2"},
+		Project:               "myproject",
 	}
 	dc := docker.NewDockerCmd(cfg)
 
@@ -33,9 +33,9 @@ func TestDockerCommand(t *testing.T) {
 
 func TestDockerComposeCommand(t *testing.T) {
 	cfg := &config.Config{
-		ComposeFile:    "docker-compose.yml",
-		ComposeProfile: "dev",
-		EnvFiles:       []string{"env1", "env2"},
+		ComposeFile:           "docker-compose.yml",
+		ComposeDefaultProfile: "dev",
+		EnvFiles:              []string{"env1", "env2"},
 	}
 	dc := docker.NewDockerCmd(cfg).DockerComposeCommand()
 
