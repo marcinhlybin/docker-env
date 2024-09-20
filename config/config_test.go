@@ -13,7 +13,7 @@ import (
 func TestNewConfig_DefaultConfig(t *testing.T) {
 	configContent := `
 compose_project_name: test_project
-vars:
+required_vars:
   - var1
   - var2
 env_files:
@@ -39,7 +39,7 @@ aws_repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo
 
 	assert.NoError(t, err)
 	assert.Equal(t, "test_project", cfg.ComposeProjectName)
-	assert.Equal(t, []string{"var1", "var2"}, cfg.Vars)
+	assert.Equal(t, []string{"var1", "var2"}, cfg.RequiredVars)
 	assert.Equal(t, 1, len(cfg.EnvFiles))
 	assert.Equal(t, "docker-compose.yml", cfg.ComposeFile)
 	assert.Equal(t, "app", cfg.ComposeDefaultProfile)

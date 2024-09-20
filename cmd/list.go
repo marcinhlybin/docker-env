@@ -4,6 +4,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
 
@@ -31,6 +32,8 @@ func listAction(c *cli.Context) error {
 	}
 
 	verbose := c.Bool("verbose") || isAliasUsed("ll")
+
+	logger.SetPrefix(reg.Config().ComposeProjectName)
 	// logger.ShowCommands(false)
 
 	return reg.ListProjects(verbose)

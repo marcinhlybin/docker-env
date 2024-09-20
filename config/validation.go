@@ -20,8 +20,8 @@ func (cfg *Config) validateConfig() error {
 		return err
 	}
 
-	if len(cfg.Vars) > 0 {
-		if err := validateVars(cfg.Vars, cfg.EnvFiles); err != nil {
+	if len(cfg.RequiredVars) > 0 {
+		if err := validateRequiredVars(cfg.RequiredVars, cfg.EnvFiles); err != nil {
 			return err
 		}
 	}
@@ -58,7 +58,7 @@ func validateEnvFiles(envFiles []string) error {
 	return nil
 }
 
-func validateVars(vars []string, envFiles []string) error {
+func validateRequiredVars(vars []string, envFiles []string) error {
 	var missingVars []string
 	env, err := godotenv.Read(envFiles...)
 	if err != nil {

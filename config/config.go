@@ -31,7 +31,7 @@ type Config struct {
 	PreStartScript         string   `yaml:"pre_start_script"`
 	PostStartScript        string   `yaml:"post_start_script"`
 	PostStopScript         string   `yaml:"post_stop_script"`
-	Vars                   []string `yaml:"vars"`
+	RequiredVars           []string `yaml:"required_vars"`
 }
 
 func NewConfig() *Config {
@@ -47,7 +47,7 @@ func NewConfig() *Config {
 		PreStartScript:         "",
 		PostStartScript:        "",
 		PostStopScript:         "",
-		Vars:                   []string{},
+		RequiredVars:           []string{},
 	}
 }
 
@@ -99,7 +99,7 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("Compose sidecar profile:", c.ComposeSidecarProfile)
 	fmt.Println()
 	fmt.Println("Env files:", strings.Join(c.EnvFiles, ", "))
-	fmt.Println("Vars:", strings.Join(c.Vars, ", "))
+	fmt.Println("Required vars:", strings.Join(c.RequiredVars, ", "))
 	fmt.Println()
 	fmt.Println("Pre-start script:", c.PreStartScript)
 	fmt.Println("Post-start script:", c.PostStartScript)
