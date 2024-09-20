@@ -21,3 +21,12 @@ func TrimToLastSlash(s string) string {
 	}
 	return s[lastSlashIndex+1:]
 }
+
+func Contains(list []string, s string) bool {
+	for _, item := range list {
+		if item == s {
+			return true
+		}
+	}
+	return false
+}

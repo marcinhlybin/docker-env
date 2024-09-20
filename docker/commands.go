@@ -119,3 +119,16 @@ func (dc *DockerCmd) TerminalCommand(p *project.Project, cmd string) *DockerCmd 
 
 	return dc
 }
+
+func (dc *DockerCmd) FetchImagesCommand(p *project.Project) *DockerCmd {
+	dc.DockerComposeCommand()
+	dc.WithProjectName(p)
+	dc.WithArgs("images", "--format", "json")
+	return dc
+}
+
+func (dc *DockerCmd) RemoveImageCommand(id string) *DockerCmd {
+	dc.DockerCommand()
+	dc.WithArgs("rmi", id)
+	return dc
+}

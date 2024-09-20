@@ -38,7 +38,7 @@ func (reg *DockerProjectRegistry) ServiceContainer(p *project.Project) (*docker.
 }
 
 func (reg *DockerProjectRegistry) ListContainers() error {
-	containers, err := reg.fetchAllContainers()
+	containers, err := reg.fetchContainers()
 	if err != nil {
 		return err
 	}
@@ -74,23 +74,20 @@ func (reg *DockerProjectRegistry) ListContainers() error {
 	return nil
 }
 
-func (reg *DockerProjectRegistry) fetchAllContainers() ([]docker.Container, error) {
+func (reg *DockerProjectRegistry) fetchContainers() ([]docker.Container, error) {
 	logger.Debug("Fetching all containers")
-	return reg.fetchContainers(nil)
+	dc := reg.dockerCmd.FetchAllContainersCommand()
+	jsonRecords, err := dc.ExecuteWithOutput()
+	if err != nil {
+		return nil, err
+	}
+
+	return reg.createContainersFromJson(jsonRecords)
 }
 
 func (reg *DockerProjectRegistry) fetchProjectContainers(p *project.Project) ([]docker.Container, error) {
 	logger.Debug("Fetching container names for %s", p.Name)
-	return reg.fetchContainers(p)
-}
-
-func (reg *DockerProjectRegistry) fetchContainers(p *project.Project) ([]docker.Container, error) {
-	var dc *docker.DockerCmd
-	if p != nil {
-		dc = reg.dockerCmd.FetchProjectContainersCommand(p)
-	} else {
-		dc = reg.dockerCmd.FetchAllContainersCommand()
-	}
+	dc := reg.dockerCmd.FetchProjectContainersCommand(p)
 
 	jsonRecords, err := dc.ExecuteWithOutput()
 	if err != nil {

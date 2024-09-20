@@ -73,6 +73,9 @@ func (reg *DockerProjectRegistry) stopOtherActiveProjects(p *project.Project) er
 		if ap.Name == p.Name {
 			continue
 		}
+		if !ap.IsRunning() {
+			continue
+		}
 		logger.Debug("Stopping %s", ap.String())
 		dc := reg.dockerCmd.StopProjectCommand(ap)
 		if err := dc.Execute(); err != nil {
@@ -100,6 +103,10 @@ func (reg *DockerProjectRegistry) StopProject(p *project.Project) error {
 }
 
 func (reg *DockerProjectRegistry) RestartProject(p *project.Project) error {
+	if err := reg.stopOtherActiveProjects(p); err != nil {
+		return err
+	}
+
 	logger.Info("Restarting", p.String())
 
 	exists, err := reg.ProjectExists(p)
@@ -124,7 +131,7 @@ func (reg *DockerProjectRegistry) RemoveProject(p *project.Project) error {
 		return err
 	}
 	if !exists {
-		logger.Warning("%s does not exist", helpers.ToTitle(p.String()))
+		logger.Warning("%s not found", helpers.ToTitle(p.String()))
 		return nil
 	}
 
@@ -136,31 +143,6 @@ func (reg *DockerProjectRegistry) BuildProject(p *project.Project, noCache bool)
 	logger.Info("Building", p.String())
 	dc := reg.dockerCmd.BuildProjectCommand(p, noCache)
 	return dc.Execute()
-}
-
-func (reg *DockerProjectRegistry) Cleanup() error {
-	logger.Info("Cleaning up")
-	includeStopped := true
-	projects, err := reg.fetchProjects(includeStopped)
-	if err != nil {
-		return err
-	}
-
-	isErr := false
-	for _, p := range projects {
-		dc := reg.dockerCmd.RemoveProjectCommand(p)
-		err := dc.Execute()
-		if err != nil {
-			isErr = true
-			logger.Warning("Could not remove %s: %v", p.String(), err)
-		}
-	}
-
-	if isErr {
-		return fmt.Errorf("one or more projects could not be removed")
-	}
-
-	return nil
 }
 
 func (reg *DockerProjectRegistry) Terminal(p *project.Project, cmd string) error {

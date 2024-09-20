@@ -6,7 +6,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const Version = "0.1.0"
+const Version = "1.0"
 
 // Set at build time
 var (
