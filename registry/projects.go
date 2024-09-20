@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -8,54 +9,70 @@ import (
 	"github.com/marcinhlybin/docker-env/project"
 )
 
-func (registry *DockerProjectRegistry) ListProjects(verbose bool) error {
+type DockerComposeProject struct {
+	Name        string `json:"name"`
+	Status      string `json:"status"`
+	ConfigFiles string `json:"configFiles"`
+}
+
+func (reg *DockerProjectRegistry) ListProjects(verbose bool) error {
 	if verbose {
-		return registry.ListContainers()
+		return reg.ListContainers()
 	}
 
 	includeStopped := true
-	projects, err := registry.fetchProjects(includeStopped)
+	projects, err := reg.fetchProjects(includeStopped)
 	if err != nil {
 		return err
 	}
 
 	for _, p := range projects {
-		fmt.Println(p.Name)
+		if p.IsRunning() {
+			fmt.Println(p.Name, "*")
+		} else {
+			fmt.Println(p.Name)
+		}
 	}
 
 	return nil
 }
 
-func (registry *DockerProjectRegistry) fetchProjects(includeStopped bool) ([]*project.Project, error) {
+func (reg *DockerProjectRegistry) fetchProjects(includeStopped bool) ([]*project.Project, error) {
 	logger.Debug("Fetching project names")
-	dc := registry.dockerCmd.FetchProjectsCommand(includeStopped)
-	names, err := dc.ExecuteWithOutput()
+	dc := reg.dockerCmd.FetchProjectsCommand(includeStopped)
+	jsonOutput, err := dc.ExecuteWithOutput()
+	if err != nil {
+		return nil, err
+	}
+	jsonString := strings.Join(jsonOutput, "")
+
+	return reg.createProjectsFromJson(jsonString)
+}
+
+func (reg *DockerProjectRegistry) createProjectsFromJson(jsonString string) ([]*project.Project, error) {
+	var projects []*project.Project
+	var dockerComposeProjects []*DockerComposeProject
+
+	// Unmarshal json
+	err := json.Unmarshal([]byte(jsonString), &dockerComposeProjects)
 	if err != nil {
 		return nil, err
 	}
 
-	logger.Debug("Found %d projects", len(names))
-
-	return registry.createProjectsFromNames(names)
-}
-
-func (registry *DockerProjectRegistry) createProjectsFromNames(names []string) ([]*project.Project, error) {
-	var projects []*project.Project
-
-	for _, name := range names {
-		name = registry.trimComposeProjectNamePrefix(name)
-
+	for _, dcProject := range dockerComposeProjects {
+		name := reg.trimComposeProjectNamePrefix(dcProject.Name)
 		p, err := project.NewProject(name, "")
 		if err != nil {
 			logger.Warning("Skipping %s due to error: %v", name, err)
 			continue
 		}
+		p.Status = dcProject.Status
 		projects = append(projects, p)
 	}
 
 	return projects, nil
 }
 
-func (registry *DockerProjectRegistry) trimComposeProjectNamePrefix(name string) string {
-	return strings.TrimPrefix(name, registry.config.Project+"-")
+func (reg *DockerProjectRegistry) trimComposeProjectNamePrefix(name string) string {
+	return strings.TrimPrefix(name, reg.config.Project+"-")
 }

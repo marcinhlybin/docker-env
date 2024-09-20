@@ -2,6 +2,7 @@ package project
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/marcinhlybin/docker-env/git"
 	"github.com/marcinhlybin/docker-env/helpers"
@@ -11,6 +12,7 @@ import (
 type Project struct {
 	Name        string
 	ServiceName string
+	Status      string
 }
 
 func NewProject(projectName, serviceName string) (*Project, error) {
@@ -65,8 +67,16 @@ func (p *Project) SetServiceName(name string) error {
 	return nil
 }
 
+func (p *Project) SetStatus(status string) {
+	p.Status = status
+}
+
 func (p *Project) IsServiceDefined() bool {
 	return p.ServiceName != ""
+}
+
+func (p *Project) IsRunning() bool {
+	return strings.Contains(p.Status, "running")
 }
 
 func (p *Project) String() string {
