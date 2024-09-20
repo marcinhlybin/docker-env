@@ -60,7 +60,7 @@ func (dc *DockerCmd) WithArgs(args ...string) *DockerCmd {
 }
 
 func (dc *DockerCmd) WithProjectName(p *project.Project) *DockerCmd {
-	projectName := dc.Config.Project + "-" + p.Name
+	projectName := dc.Config.ComposeProjectName + "-" + p.Name
 	dc.Args = append(dc.Args, "--project-name", projectName)
 	return dc
 }
@@ -71,7 +71,7 @@ func (dc *DockerCmd) WithSidecarProfile() *DockerCmd {
 }
 
 func (dc *DockerCmd) WithProjectFilter() *DockerCmd {
-	prefix := "name=" + dc.Config.Project + "-"
+	prefix := "name=" + dc.Config.ComposeProjectName + "-"
 	dc.Args = append(dc.Args, "--filter", prefix)
 	return dc
 }

@@ -3,6 +3,7 @@ package registry
 import (
 	"fmt"
 
+	"github.com/marcinhlybin/docker-env/addons"
 	"github.com/marcinhlybin/docker-env/config"
 	"github.com/marcinhlybin/docker-env/docker"
 	"github.com/marcinhlybin/docker-env/helpers"
@@ -49,6 +50,12 @@ func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, upd
 		return err
 	}
 
+	// Run pre-start script
+	if err := addons.RunScript("pre-start", reg.config.PreStartScript); err != nil {
+		return err
+	}
+
+	// Login to AWS registry
 	if reg.config.AwsLogin {
 		logger.Info("Logging into AWS registry")
 		if err := reg.dockerCmd.LoginAws(); err != nil {
@@ -56,9 +63,15 @@ func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, upd
 		}
 	}
 
+	// Start project
 	logger.Info("Starting", p.String())
 	dc := reg.dockerCmd.CreateAndStartProjectCommand(p, recreate, update)
-	return dc.Execute()
+	if err := dc.Execute(); err != nil {
+		return err
+	}
+
+	// Run post-start script
+	return addons.RunScript("post-start", reg.config.PostStartScript)
 }
 
 func (reg *DockerProjectRegistry) stopOtherActiveProjects(p *project.Project) error {
@@ -99,7 +112,12 @@ func (reg *DockerProjectRegistry) StopProject(p *project.Project) error {
 	}
 
 	dc := reg.dockerCmd.StopProjectCommand(p)
-	return dc.Execute()
+	err = dc.Execute()
+	if err != nil {
+		return err
+	}
+
+	return addons.RunScript("post-stop", reg.config.PostStopScript)
 }
 
 func (reg *DockerProjectRegistry) RestartProject(p *project.Project) error {

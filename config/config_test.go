@@ -1,51 +1,46 @@
 package config_test
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/marcinhlybin/docker-env/config"
+	"github.com/marcinhlybin/docker-env/test_helpers"
 	"github.com/stretchr/testify/assert"
 )
 
-func createTempConfigFile(t *testing.T, content string) string {
-	tmpfile, err := os.CreateTemp("", "config-*.yaml")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if _, err := tmpfile.Write([]byte(content)); err != nil {
-		t.Fatal(err)
-	}
-	if err := tmpfile.Close(); err != nil {
-		t.Fatal(err)
-	}
-
-	return tmpfile.Name()
-}
-
 func TestNewConfig_DefaultConfig(t *testing.T) {
 	configContent := `
-project: test_project
-secrets:
-  - secret1
-  - secret2
+compose_project_name: test_project
+vars:
+  - var1
+  - var2
 env_files:
-  - .env
+  - %s
 compose_file: docker-compose.yml
 compose_default_profile: app
 aws_login: true
 aws_region: us-west-2
 aws_repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo
 `
-	configPath := createTempConfigFile(t, configContent)
+	// Create temp env file
+	envFile := test_helpers.CreateTempFile(t, "var1=value1\nvar2=value")
+	defer os.Remove(envFile)
+
+	// Inject the env file path into the config content
+	configContent = fmt.Sprintf(configContent, envFile)
+
+	configPath := test_helpers.CreateTempFile(t, configContent)
 	defer os.Remove(configPath)
 
-	cfg, err := config.NewConfig(configPath)
+	cfg := config.NewConfig()
+	err := cfg.LoadConfig(configPath)
+
 	assert.NoError(t, err)
-	assert.Equal(t, "test_project", cfg.Project)
-	assert.Equal(t, []string{"secret1", "secret2"}, cfg.Secrets)
-	assert.Equal(t, []string{".env"}, cfg.EnvFiles)
+	assert.Equal(t, "test_project", cfg.ComposeProjectName)
+	assert.Equal(t, []string{"var1", "var2"}, cfg.Vars)
+	assert.Equal(t, 1, len(cfg.EnvFiles))
 	assert.Equal(t, "docker-compose.yml", cfg.ComposeFile)
 	assert.Equal(t, "app", cfg.ComposeDefaultProfile)
 	assert.True(t, cfg.AwsLogin)
@@ -55,12 +50,7 @@ aws_repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo
 
 func TestNewConfig_OverrideConfig(t *testing.T) {
 	configContent := `
-project: test_project
-secrets:
-  - secret1
-  - secret2
-env_files:
-  - .env
+compose_project_name: test_project
 compose_file: docker-compose.yml
 compose_default_profile: app
 aws_login: true
@@ -68,26 +58,28 @@ aws_region: us-west-2
 aws_repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo
 `
 	overrideContent := `
-project: override_project
+compose_project_name: override_project
 aws_region: us-east-1
 `
-	configPath := createTempConfigFile(t, configContent)
+	configPath := test_helpers.CreateTempFile(t, configContent)
 	defer os.Remove(configPath)
 
-	overridePath := createTempConfigFile(t, overrideContent)
+	overridePath := test_helpers.CreateTempFile(t, overrideContent)
 	defer os.Remove(overridePath)
 
 	// Temporarily override the default override config path
-	config.DefaultOverrideConfigPath = overridePath
+	config.OverrideConfigPath = overridePath
 
-	cfg, err := config.NewConfig(configPath)
+	cfg := config.NewConfig()
+	err := cfg.LoadConfig(configPath)
 	assert.NoError(t, err)
-	assert.Equal(t, "override_project", cfg.Project)
+	assert.Equal(t, "override_project", cfg.ComposeProjectName)
 	assert.Equal(t, "us-east-1", cfg.AwsRegion)
 }
 
 func TestNewConfig_MissingConfigFile(t *testing.T) {
-	_, err := config.NewConfig("nonexistent.yaml")
+	cfg := config.NewConfig()
+	err := cfg.LoadConfig("nonexistent.yaml")
 	assert.Error(t, err)
 }
 
@@ -95,9 +87,10 @@ func TestNewConfig_InvalidConfigFile(t *testing.T) {
 	configContent := `
 invalid_yaml_content
 `
-	configPath := createTempConfigFile(t, configContent)
+	configPath := test_helpers.CreateTempFile(t, configContent)
 	defer os.Remove(configPath)
 
-	_, err := config.NewConfig(configPath)
+	cfg := config.NewConfig()
+	err := cfg.LoadConfig(configPath)
 	assert.Error(t, err)
 }

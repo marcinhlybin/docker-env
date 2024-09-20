@@ -20,7 +20,7 @@ func cleanupAction(c *cli.Context) error {
 		return err
 	}
 
-	logger.SetPrefix(reg.Config().Project)
+	logger.SetPrefix(reg.Config().ComposeProjectName)
 
 	return reg.Cleanup()
 }

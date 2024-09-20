@@ -14,7 +14,7 @@ func SetupDockerCompose(t *testing.T) *docker.DockerCmd {
 		ComposeFile:           "docker-compose.yml",
 		ComposeDefaultProfile: "default",
 		EnvFiles:              []string{"env1", "env2"},
-		Project:               "project",
+		ComposeProjectName:    "project",
 	}
 
 	return docker.NewDockerCmd(cfg)

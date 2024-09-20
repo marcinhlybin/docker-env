@@ -27,7 +27,11 @@ func NewRegistry(c *cli.Context) (*registry.DockerProjectRegistry, error) {
 }
 
 func NewConfig(c *cli.Context) (*config.Config, error) {
-	return config.NewConfig(c.String("config"))
+	cfg := config.NewConfig()
+	if err := cfg.LoadConfig(c.String("config")); err != nil {
+		return nil, err
+	}
+	return cfg, nil
 }
 
 func ExitWithErrorOnArgs(c *cli.Context) {

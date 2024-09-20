@@ -14,7 +14,7 @@ func TestNewDockerCmd(t *testing.T) {
 		ComposeFile:           "docker-compose.yml",
 		ComposeDefaultProfile: "dev",
 		EnvFiles:              []string{"env1", "env2"},
-		Project:               "myproject",
+		ComposeProjectName:    "myproject",
 	}
 	dc := docker.NewDockerCmd(cfg)
 
@@ -77,7 +77,7 @@ func TestWithArgs(t *testing.T) {
 
 func TestWithProjectName(t *testing.T) {
 	cfg := &config.Config{
-		Project: "myproject",
+		ComposeProjectName: "myproject",
 	}
 	p := &project.Project{
 		Name: "service",
@@ -90,7 +90,7 @@ func TestWithProjectName(t *testing.T) {
 
 func TestWithProjectFilter(t *testing.T) {
 	cfg := &config.Config{
-		Project: "myproject",
+		ComposeProjectName: "myproject",
 	}
 	dc := docker.NewDockerCmd(cfg).DockerCommand().WithProjectFilter()
 

@@ -10,24 +10,17 @@ import (
 
 // Defaults for the config
 var (
-	DefaultConfigPath             = ".docker-env/config.yaml"
-	DefaultOverrideConfigPath     = ".docker-env/config.override.yaml"
-	DefaultComposeFile            = "docker-compose.yml"
-	DefaultComposeDefaultProfile  = "app"
-	DefaultComposeSidecarProfile  = "sidecar"
-	DefaultTerminalDefaultService = "app"
-	DefaultTerminalDefaultCommand = "/bin/bash"
-	DefaultVscodeDefaultService   = "app"
-	DefaultVscodeDefaultDir       = "/"
+	ConfigPath         = ".docker-env/config.yaml"
+	OverrideConfigPath = ".docker-env/config.override.yaml"
 )
 
 type Config struct {
-	Project                string   `yaml:"project"`
-	Secrets                []string `yaml:"secrets"`
-	EnvFiles               []string `yaml:"env_files"`
+	Path                   string
+	ComposeProjectName     string   `yaml:"compose_project_name"`
 	ComposeFile            string   `yaml:"compose_file"`
 	ComposeDefaultProfile  string   `yaml:"compose_default_profile"`
 	ComposeSidecarProfile  string   `yaml:"compose_sidecar_profile"`
+	EnvFiles               []string `yaml:"env_files"`
 	TerminalDefaultService string   `yaml:"terminal_default_service"`
 	TerminalDefaultCommand string   `yaml:"terminal_default_command"`
 	VscodeDefaultService   string   `yaml:"vscode_default_service"`
@@ -35,40 +28,55 @@ type Config struct {
 	AwsLogin               bool     `yaml:"aws_login"`
 	AwsRegion              string   `yaml:"aws_region"`
 	AwsRepository          string   `yaml:"aws_repository"`
+	PreStartScript         string   `yaml:"pre_start_script"`
+	PostStartScript        string   `yaml:"post_start_script"`
+	PostStopScript         string   `yaml:"post_stop_script"`
+	Vars                   []string `yaml:"vars"`
 }
 
-// Read and parse the config file with fields validation
-func NewConfig(path string) (*Config, error) {
-	var cfg Config
+func NewConfig() *Config {
+	return &Config{
+		ComposeFile:            "docker-compose.yml",
+		ComposeDefaultProfile:  "app",
+		ComposeSidecarProfile:  "sidecar",
+		EnvFiles:               []string{},
+		TerminalDefaultService: "app",
+		TerminalDefaultCommand: "/bin/bash",
+		VscodeDefaultService:   "app",
+		VscodeDefaultDir:       "/",
+		PreStartScript:         "",
+		PostStartScript:        "",
+		PostStopScript:         "",
+		Vars:                   []string{},
+	}
+}
 
+func (cfg *Config) LoadConfig(path string) error {
 	if path == "" {
-		path = DefaultConfigPath
+		path = ConfigPath
 	}
 
 	// Read main config file
-	if err := loadConfigFile(path, &cfg); err != nil {
-		return nil, err
+	if err := readConfigFile(path, cfg); err != nil {
+		return err
 	}
 
 	// Read override config file if it exists
-	overridePath := DefaultOverrideConfigPath
-	if _, err := os.Stat(overridePath); err == nil {
-		if err := loadConfigFile(overridePath, &cfg); err != nil {
-			return nil, err
+	if _, err := os.Stat(OverrideConfigPath); err == nil {
+		if err := readConfigFile(OverrideConfigPath, cfg); err != nil {
+			return err
 		}
 	}
 
-	setDefaults(&cfg)
-
 	// Validate config
-	if err := ValidateConfig(&cfg); err != nil {
-		return nil, fmt.Errorf("config validation failed: %w", err)
+	if err := cfg.validateConfig(); err != nil {
+		return fmt.Errorf("config validation failed: %w", err)
 	}
 
-	return &cfg, nil
+	return nil
 }
 
-func loadConfigFile(path string, cfg *Config) error {
+func readConfigFile(path string, cfg *Config) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return err
@@ -84,45 +92,26 @@ func loadConfigFile(path string, cfg *Config) error {
 	return nil
 }
 
-func setDefaults(cfg *Config) {
-	if cfg.ComposeFile == "" {
-		cfg.ComposeFile = DefaultComposeFile
-	}
-	if cfg.ComposeDefaultProfile == "" {
-		cfg.ComposeDefaultProfile = DefaultComposeDefaultProfile
-	}
-	if cfg.ComposeSidecarProfile == "" {
-		cfg.ComposeSidecarProfile = DefaultComposeSidecarProfile
-	}
-	if cfg.TerminalDefaultService == "" {
-		cfg.TerminalDefaultService = DefaultTerminalDefaultService
-	}
-	if cfg.TerminalDefaultCommand == "" {
-		cfg.TerminalDefaultCommand = DefaultTerminalDefaultCommand
-	}
-	if cfg.VscodeDefaultService == "" {
-		cfg.VscodeDefaultService = DefaultVscodeDefaultService
-	}
-	if cfg.VscodeDefaultDir == "" {
-		cfg.VscodeDefaultDir = DefaultVscodeDefaultDir
-	}
-}
-
 func (c *Config) ShowConfig() error {
-	fmt.Println("Project name:", c.Project)
-	fmt.Println("Mandatory secrets:", strings.Join(c.Secrets, ", "))
-	fmt.Println("Env files:", strings.Join(c.EnvFiles, ", "))
-	fmt.Println()
+	fmt.Println("Compose project name:", c.ComposeProjectName)
 	fmt.Println("Compose file:", c.ComposeFile)
 	fmt.Println("Compose default profile:", c.ComposeDefaultProfile)
 	fmt.Println("Compose sidecar profile:", c.ComposeSidecarProfile)
+	fmt.Println()
+	fmt.Println("Env files:", strings.Join(c.EnvFiles, ", "))
+	fmt.Println("Vars:", strings.Join(c.Vars, ", "))
+	fmt.Println()
+	fmt.Println("Pre-start script:", c.PreStartScript)
+	fmt.Println("Post-start script:", c.PostStartScript)
+	fmt.Println("Post-stop script:", c.PostStopScript)
+	fmt.Println()
+	fmt.Println("AWS login:", c.AwsLogin)
+	fmt.Println("AWS region:", c.AwsRegion)
+	fmt.Println("AWS repository:", c.AwsRepository)
 	fmt.Println()
 	fmt.Println("Terminal default service:", c.TerminalDefaultService)
 	fmt.Println("Terminal default command:", c.TerminalDefaultCommand)
 	fmt.Println("VSCode default service:", c.VscodeDefaultService)
 	fmt.Println("VSCode default directory:", c.VscodeDefaultDir)
-	fmt.Println("AWS login:", c.AwsLogin)
-	fmt.Println("AWS region:", c.AwsRegion)
-	fmt.Println("AWS repository:", c.AwsRepository)
 	return nil
 }
