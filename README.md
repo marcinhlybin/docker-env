@@ -208,13 +208,15 @@ post_stop_script: .docker-env/post-stop.sh
 
 ## Hooks
 
-Sample hooks to generate SSL certs and set up ssh-agent can be found in `.docker-env/` directory.
-
 Supported hooks are:
 * pre-start
 * post-start
 * post-stop
 
+Sample hooks can be found in `.docker-env/` directory:
+* Generate SSL certificates: [.docker-env/pre-start.d/10-ssl-certs](https://github.com/marcinhlybin/docker-env/blob/master/.docker-env/pre-start.d/10-ssl-certs.sh)
+* Run ssh-agent: [.docker-env/pre-start.d/30-ssh-agent.sh](https://github.com/marcinhlybin/docker-env/blob/master/.docker-env/pre-start.d/30-ssh-agent.sh)
+* ...and other
 
 ## Building
 
