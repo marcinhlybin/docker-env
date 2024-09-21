@@ -20,51 +20,6 @@ In short, docker-env abstracts common docker-compose tasks, allowing you to focu
 * Hooks: Customize pre-start, post-start, and post-stop behaviors with hooks.
 * Multi-environment support: Easily manage multiple Docker Compose environments across projects.
 
-## Hooks
-
-Sample hooks to generate SSL certs and set up ssh-agent can be found in `.docker-env/` directory.
-
-Supported hooks are:
-* pre-start
-* post-start
-* post-stop
-
-## Docker compose
-
-### Requirements
-
-Container name in service definition **must be prefixed** with `$COMPOSE_PROJECT_NAME-`:
-
-```
-services:
-  app:
-    container_name: $COMPOSE_PROJECT_NAME-app
-    image: 1234567890.dkr.ecr.eu-central-1.amazonaws.com/my-app
-    ports:
-    [...]
-```
-
-### Extending docker compose configuration
-
-By default **docker-env** uses `docker-compose.yml` for service definition. The configuration can be extended with `docker-compose.override.yml`.
-
-### Variables
-
-Docker compose configuration can be manipulated with environmental variables stored in `env_files` defined in `./docker-env/config.yml` file. Usually it is local `.env` file which should be added to `.gitignore` as it may contain secrets like `GITHUB_TOKEN` or AWS credentials.
-
-By setting `required_vars` option in `./docker-env/config.yml` you can check during runtime if variables can be found.
-
-### Sidecar containers
-
-By default **docker-env** uses `app` profile to start contianers. Profile `sidecar` is used to specify containers that are not started by default and can be started later individually using `docker-env start -s` command.
-
-Profile names are defined in the configuration file:
-
-```
-compose_default_profile: app
-compose_sidecar_profile: sidecar
-```
-
 ## Usage
 
 ```
@@ -160,6 +115,42 @@ docker-env shell
 docker-env shell -s postgresql createdb -U postgres mydb
 ```
 
+## Docker compose
+
+### Requirements
+
+Container name in service definition **must be prefixed** with `$COMPOSE_PROJECT_NAME-`:
+
+```
+services:
+  app:
+    container_name: $COMPOSE_PROJECT_NAME-app
+    image: 1234567890.dkr.ecr.eu-central-1.amazonaws.com/my-app
+    ports:
+    [...]
+```
+
+### Extending docker compose configuration
+
+By default **docker-env** uses `docker-compose.yml` for service definition. The configuration can be extended with `docker-compose.override.yml`.
+
+### Variables
+
+Docker compose configuration can be manipulated with environmental variables stored in `env_files` defined in `./docker-env/config.yml` file. Usually it is local `.env` file which should be added to `.gitignore` as it may contain secrets like `GITHUB_TOKEN` or AWS credentials.
+
+By setting `required_vars` option in `./docker-env/config.yml` you can check during runtime if variables can be found.
+
+### Sidecar containers
+
+By default **docker-env** uses `app` profile to start contianers. Profile `sidecar` is used to specify containers that are not started by default and can be started later individually using `docker-env start -s` command.
+
+Profile names are defined in the configuration file:
+
+```
+compose_default_profile: app
+compose_sidecar_profile: sidecar
+```
+
 ## Configuration
 
 Each repository should define its own configuration file located in `./docker-env/config.yml`. It is recommended to commit config file to the repository. It can be extended locally with `./docker-env/config.override.yml` (add it to `.gitignore`). For example it can be used to replace registry images and build own using `docker-env build` command.
@@ -214,6 +205,16 @@ pre_start_script: .docker-env/pre-start.sh
 post_start_script: .docker-env/post-start.sh
 post_stop_script: .docker-env/post-stop.sh
 ```
+
+## Hooks
+
+Sample hooks to generate SSL certs and set up ssh-agent can be found in `.docker-env/` directory.
+
+Supported hooks are:
+* pre-start
+* post-start
+* post-stop
+
 
 ## Building
 
