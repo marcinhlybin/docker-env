@@ -22,9 +22,9 @@ func NewProject(projectName, serviceName string) (*Project, error) {
 
 	var err error
 	if projectName != "" {
-		p.SetProjectName(projectName)
+		err = p.SetProjectName(projectName)
 	} else {
-		p.SetProjectNameFromGitBranch()
+		err = p.SetProjectNameFromGitBranch()
 	}
 	if err != nil {
 		return nil, err

@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/marcinhlybin/docker-env/addons"
 	"github.com/marcinhlybin/docker-env/config"
@@ -46,11 +47,6 @@ func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, upd
 		return err
 	}
 
-	// Run pre-start script
-	if err := addons.RunScript("pre-start", reg.Config.PreStartScript); err != nil {
-		return err
-	}
-
 	// Login to AWS registry
 	if reg.Config.AwsLogin {
 		logger.Info("Logging into AWS registry")
@@ -62,12 +58,8 @@ func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, upd
 	// Start project
 	logger.Info("Starting %s", p.String())
 	dc := reg.dockerCmd.CreateAndStartProjectCommand(p, recreate, update)
-	if err := dc.Execute(); err != nil {
-		return err
-	}
 
-	// Run post-start script
-	return addons.RunScript("post-start", reg.Config.PostStartScript)
+	return dc.Execute()
 }
 
 func (reg *DockerProjectRegistry) stopOtherActiveProjects(p *project.Project) error {
@@ -159,7 +151,7 @@ func (reg *DockerProjectRegistry) BuildProject(p *project.Project, noCache bool)
 	return dc.Execute()
 }
 
-func (reg *DockerProjectRegistry) Terminal(p *project.Project, cmd string) error {
+func (reg *DockerProjectRegistry) Terminal(p *project.Project, cmd []string) error {
 	logger.Info("Running terminal for %s", p.String())
 
 	// Set default service
@@ -167,9 +159,9 @@ func (reg *DockerProjectRegistry) Terminal(p *project.Project, cmd string) error
 		p.SetServiceName(reg.Config.TerminalDefaultService)
 	}
 
-	// Set default directory
-	if cmd == "" {
-		cmd = reg.Config.TerminalDefaultCommand
+	// Set default command
+	if len(cmd) == 0 {
+		cmd = strings.Split(reg.Config.TerminalDefaultCommand, " ")
 	}
 
 	dc := reg.dockerCmd.TerminalCommand(p, cmd)

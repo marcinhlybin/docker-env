@@ -10,8 +10,8 @@ import (
 
 // Defaults for the config
 var (
-	ConfigPath         = ".docker-env/config.yaml"
-	ConfigPathOverride = ".docker-env/config.override.yaml"
+	ConfigPath         = ".docker-env/config.yml"
+	ConfigPathOverride = ".docker-env/config.override.yml"
 )
 
 type Config struct {

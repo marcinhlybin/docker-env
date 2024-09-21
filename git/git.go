@@ -25,7 +25,7 @@ func CurrentBranch() (string, error) {
 	}
 
 	// Extract and print the branch name
-	branchName := ref.Name().Short()
+	branch := ref.Name().Short()
 
-	return branchName, nil
+	return branch, nil
 }
