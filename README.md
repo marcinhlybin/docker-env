@@ -47,7 +47,7 @@ services:
 
 Docker compose configuration can be manipulated with environmental variables stored in `env_files` defined in `./docker-env/config.yml` file. Usually it is local `.env` file which should be added to `.gitignore` as it may contain secrets like `GITHUB_TOKEN` or AWS credentials.
 
-By setting `required_vars` option in `./docker-env/config.yml` you can check during runtime if variables are found.
+By setting `required_vars` option in `./docker-env/config.yml` you can check during runtime if variables can be found.
 
 ## Usage
 
