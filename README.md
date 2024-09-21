@@ -169,3 +169,14 @@ pre_start_script: .docker-env/pre-start.sh
 post_start_script: .docker-env/post-start.sh
 post_stop_script: .docker-env/post-stop.sh
 ```
+
+## Building
+
+Run `make` to build a binary to the current directory.
+
+```
+make test
+make install
+```
+
+Installs into `/usr/local/bin`. Sudo password required.
