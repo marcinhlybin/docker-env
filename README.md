@@ -29,6 +29,26 @@ Supported hooks are:
 * post-start
 * post-stop
 
+## Docker compose
+
+By default **docker-env** uses `docker-compose.yml` for service definition. The configuration can be extended with `docker-compose.override.yml`.
+
+Container name in service definition **must be** prefixed with compose project name:
+
+```
+services:
+  app:
+    container_name: $COMPOSE_PROJECT_NAME-app
+    image: 1234567890.dkr.ecr.eu-central-1.amazonaws.com/my-app
+    ports:
+    [...]
+```
+
+
+Docker compose configuration can be manipulated with environmental variables stored in `env_files` defined in `./docker-env/config.yml` file. Usually it is local `.env` file which should be added to `.gitignore` as it may contain secrets like `GITHUB_TOKEN` or AWS credentials.
+
+By setting `required_vars` option in `./docker-env/config.yml` you can check during runtime if variables are found.
+
 ## Usage
 
 ```
@@ -126,7 +146,7 @@ docker-env shell -s postgresql createdb -U postgres mydb
 
 ## Configuration
 
-Each repository should define its own configuration file located in `./docker-env/config.yml`
+Each repository should define its own configuration file located in `./docker-env/config.yml`. It is recommended to commit config file to the repository. It can be extended locally with `./docker-env/config.override.yml` (add it to `.gitignore`). For example it can be used to replace registry images and build own using `docker-env build` command.
 
 ```
 ### Docker-env configuration file
