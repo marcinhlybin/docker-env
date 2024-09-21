@@ -31,7 +31,7 @@ Supported hooks are:
 
 ## Docker compose
 
-By default **docker-env** uses `docker-compose.yml` for service definition. The configuration can be extended with `docker-compose.override.yml`.
+### Requirements
 
 Container name in service definition **must be prefixed** with `$COMPOSE_PROJECT_NAME-`:
 
@@ -44,10 +44,26 @@ services:
     [...]
 ```
 
+### Extending docker compose configuration
+
+By default **docker-env** uses `docker-compose.yml` for service definition. The configuration can be extended with `docker-compose.override.yml`.
+
+### Variables
 
 Docker compose configuration can be manipulated with environmental variables stored in `env_files` defined in `./docker-env/config.yml` file. Usually it is local `.env` file which should be added to `.gitignore` as it may contain secrets like `GITHUB_TOKEN` or AWS credentials.
 
 By setting `required_vars` option in `./docker-env/config.yml` you can check during runtime if variables can be found.
+
+### Sidecar containers
+
+By default **docker-env** uses `app` profile to start contianers. Profile `sidecar` is used to specify containers that are not started by default and can be started later individually using `docker-env start -s` command.
+
+Profile names are defined in the configuration file:
+
+```
+compose_default_profile: app
+compose_sidecar_profile: sidecar
+```
 
 ## Usage
 
