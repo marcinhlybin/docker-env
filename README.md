@@ -20,6 +20,15 @@ In short, docker-env abstracts common docker-compose tasks, allowing you to focu
 * Hooks: Customize pre-start, post-start, and post-stop behaviors with hooks.
 * Multi-environment support: Easily manage multiple Docker Compose environments across projects.
 
+## Hooks
+
+Sample hooks can be found in `.docker-env/` directory.
+
+Supported hooks are:
+* pre-start
+* post-start
+* post-stop
+
 ## Usage
 
 ```
