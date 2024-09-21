@@ -2,6 +2,8 @@
 
 **docker-env** allows developers to create, manage and switch between isolated docker projects (or stacks) per git branch within a single repository. It simplifies working with docker-compose and supports hooks for customization and sidecar containers for optional services.
 
+![demo](https://github.com/user-attachments/assets/52289faf-8d40-42dc-8670-b5260ccfedc6)
+
 ## Why
 
 Managing Docker environments across multiple branches or projects can be cumbersome, especially when dealing with complex application stacks that include databases, caches, and other services.
