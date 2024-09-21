@@ -2,6 +2,8 @@
 
 **docker-env** allows developers to create, manage and switch between isolated docker projects (or stacks) per git branch within a single repository. It simplifies working with docker-compose and supports hooks for customization and sidecar containers for optional services.
 
+![demo](https://github.com/user-attachments/assets/52289faf-8d40-42dc-8670-b5260ccfedc6)
+
 ## Why
 
 Managing Docker environments across multiple branches or projects can be cumbersome, especially when dealing with complex application stacks that include databases, caches, and other services.
@@ -17,6 +19,15 @@ In short, docker-env abstracts common docker-compose tasks, allowing you to focu
 * Sidecar containers: Optional services, like admin tools or background jobs, can be started as needed without starting by default.
 * Hooks: Customize pre-start, post-start, and post-stop behaviors with hooks.
 * Multi-environment support: Easily manage multiple Docker Compose environments across projects.
+
+## Hooks
+
+Sample hooks can be found in `.docker-env/` directory.
+
+Supported hooks are:
+* pre-start
+* post-start
+* post-stop
 
 ## Usage
 
@@ -167,3 +178,14 @@ pre_start_script: .docker-env/pre-start.sh
 post_start_script: .docker-env/post-start.sh
 post_stop_script: .docker-env/post-stop.sh
 ```
+
+## Building
+
+Run `make` to build a binary to the current directory.
+
+```
+make test
+make install
+```
+
+Installs into `/usr/local/bin`. Sudo password required.
