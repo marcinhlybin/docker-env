@@ -29,17 +29,12 @@ If environment name is not specified current branch name is used.`,
 func removeAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	p, err := NewProject(c)
+	ctx, err := NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	reg, err := NewRegistry(c)
-	if err != nil {
-		return err
-	}
+	logger.SetPrefix(ctx.Project.Name)
 
-	logger.SetPrefix(p.Name)
-
-	return reg.RemoveProject(p)
+	return ctx.Registry.RemoveProject(ctx.Project)
 }

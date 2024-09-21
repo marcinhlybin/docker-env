@@ -28,19 +28,14 @@ Directory is optional. By default it will open the / directory.`,
 }
 
 func codeAction(c *cli.Context) error {
-	p, err := NewProject(c)
+	ctx, err := NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	reg, err := NewRegistry(c)
-	if err != nil {
-		return err
-	}
-
-	logger.SetPrefix(p.Name)
+	logger.SetPrefix(ctx.Project.Name)
 
 	dir := c.Args().First()
 
-	return reg.Code(p, dir)
+	return ctx.Registry.Code(ctx.Project, dir)
 }

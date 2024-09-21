@@ -15,12 +15,12 @@ var CleanupCommand = cli.Command{
 func cleanupAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	reg, err := NewRegistry(c)
+	ctx, err := NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	logger.SetPrefix(reg.Config().ComposeProjectName)
+	logger.SetPrefix(ctx.Config.ComposeProjectName)
 
-	return reg.Cleanup()
+	return ctx.Registry.Cleanup()
 }

@@ -32,17 +32,12 @@ If environment name is not specified current branch name is used.`,
 func buildAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	p, err := NewProject(c)
-	if err != nil {
-		return err
-	}
-
-	reg, err := NewRegistry(c)
+	ctx, err := NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
 	noCache := c.Bool("no-cache")
 
-	return reg.BuildProject(p, noCache)
+	return ctx.Registry.BuildProject(ctx.Project, noCache)
 }

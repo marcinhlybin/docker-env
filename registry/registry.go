@@ -12,7 +12,7 @@ import (
 )
 
 type DockerProjectRegistry struct {
-	config    *config.Config
+	Config    *config.Config
 	dockerCmd *docker.DockerCmd
 }
 
@@ -20,13 +20,9 @@ func NewDockerProjectRegistry(cfg *config.Config) *DockerProjectRegistry {
 	dc := docker.NewDockerCmd(cfg)
 
 	return &DockerProjectRegistry{
+		Config:    cfg,
 		dockerCmd: dc,
-		config:    cfg,
 	}
-}
-
-func (reg *DockerProjectRegistry) Config() *config.Config {
-	return reg.config
 }
 
 func (reg *DockerProjectRegistry) ProjectExists(p *project.Project) (bool, error) {
@@ -51,12 +47,12 @@ func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, upd
 	}
 
 	// Run pre-start script
-	if err := addons.RunScript("pre-start", reg.config.PreStartScript); err != nil {
+	if err := addons.RunScript("pre-start", reg.Config.PreStartScript); err != nil {
 		return err
 	}
 
 	// Login to AWS registry
-	if reg.config.AwsLogin {
+	if reg.Config.AwsLogin {
 		logger.Info("Logging into AWS registry")
 		if err := reg.dockerCmd.LoginAws(); err != nil {
 			return err
@@ -71,7 +67,7 @@ func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, upd
 	}
 
 	// Run post-start script
-	return addons.RunScript("post-start", reg.config.PostStartScript)
+	return addons.RunScript("post-start", reg.Config.PostStartScript)
 }
 
 func (reg *DockerProjectRegistry) stopOtherActiveProjects(p *project.Project) error {
@@ -117,7 +113,7 @@ func (reg *DockerProjectRegistry) StopProject(p *project.Project) error {
 		return err
 	}
 
-	return addons.RunScript("post-stop", reg.config.PostStopScript)
+	return addons.RunScript("post-stop", reg.Config.PostStopScript)
 }
 
 func (reg *DockerProjectRegistry) RestartProject(p *project.Project) error {
@@ -168,12 +164,12 @@ func (reg *DockerProjectRegistry) Terminal(p *project.Project, cmd string) error
 
 	// Set default service
 	if !p.IsServiceDefined() {
-		p.SetServiceName(reg.config.TerminalDefaultService)
+		p.SetServiceName(reg.Config.TerminalDefaultService)
 	}
 
 	// Set default directory
 	if cmd == "" {
-		cmd = reg.config.TerminalDefaultCommand
+		cmd = reg.Config.TerminalDefaultCommand
 	}
 
 	dc := reg.dockerCmd.TerminalCommand(p, cmd)
@@ -187,12 +183,12 @@ func (reg *DockerProjectRegistry) Code(p *project.Project, dir string) error {
 	// Set default service
 	if !p.IsServiceDefined() {
 		logger.Debug("Setting default service name")
-		p.SetServiceName(reg.config.VscodeDefaultService)
+		p.SetServiceName(reg.Config.VscodeDefaultService)
 	}
 
 	// Set default directory
 	if dir == "" {
-		dir = reg.config.VscodeDefaultDir
+		dir = reg.Config.VscodeDefaultDir
 	}
 
 	container, err := reg.ServiceContainer(p)

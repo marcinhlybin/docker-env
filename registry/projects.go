@@ -74,5 +74,5 @@ func (reg *DockerProjectRegistry) createProjectsFromJson(jsonString string) ([]*
 }
 
 func (reg *DockerProjectRegistry) trimComposeProjectNamePrefix(name string) string {
-	return strings.TrimPrefix(name, reg.config.ComposeProjectName+"-")
+	return strings.TrimPrefix(name, reg.Config.ComposeProjectName+"-")
 }

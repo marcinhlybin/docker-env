@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/addons"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -40,12 +41,7 @@ If project does not exist it will be created.`,
 func startAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	p, err := NewProject(c)
-	if err != nil {
-		return err
-	}
-
-	reg, err := NewRegistry(c)
+	ctx, err := NewAppContext(c)
 	if err != nil {
 		return err
 	}
@@ -53,7 +49,12 @@ func startAction(c *cli.Context) error {
 	recreate := c.Bool("recreate")
 	update := c.Bool("update")
 
-	logger.SetPrefix(p.Name)
+	logger.SetPrefix(ctx.Project.Name)
 
-	return reg.StartProject(p, recreate, update)
+	// Run pre-start script
+	if err := addons.RunScript("pre-start", ctx.Config.PreStartScript); err != nil {
+		return err
+	}
+
+	return ctx.Registry.StartProject(ctx.Project, recreate, update)
 }

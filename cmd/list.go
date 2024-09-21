@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"os"
-	"strings"
-
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -26,24 +23,14 @@ var ListCommand = cli.Command{
 func listAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	reg, err := NewRegistry(c)
+	ctx, err := NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
 	verbose := c.Bool("verbose") || isAliasUsed("ll")
 
-	logger.SetPrefix(reg.Config().ComposeProjectName)
-	// logger.ShowCommands(false)
+	logger.SetPrefix(ctx.Config.ComposeProjectName)
 
-	return reg.ListProjects(verbose)
-}
-
-func isAliasUsed(alias string) bool {
-	for _, arg := range os.Args {
-		if strings.Contains(arg, alias) {
-			return true
-		}
-	}
-	return false
+	return ctx.Registry.ListProjects(verbose)
 }
