@@ -34,7 +34,7 @@ func terminalAction(c *cli.Context) error {
 
 	logger.SetPrefix(ctx.Project.Name)
 
-	cmd := c.Args().First()
+	cmd := c.Args().Slice()
 
 	return ctx.Registry.Terminal(ctx.Project, cmd)
 }

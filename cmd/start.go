@@ -56,5 +56,10 @@ func startAction(c *cli.Context) error {
 		return err
 	}
 
-	return ctx.Registry.StartProject(ctx.Project, recreate, update)
+	if err := ctx.Registry.StartProject(ctx.Project, recreate, update); err != nil {
+		return err
+	}
+
+	// Run post-start script
+	return addons.RunScript("post-start", ctx.Config.PostStartScript)
 }

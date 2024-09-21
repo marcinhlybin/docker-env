@@ -110,12 +110,12 @@ func (dc *DockerCmd) BuildProjectCommand(p *project.Project, noCache bool) *Dock
 	return dc
 }
 
-func (dc *DockerCmd) TerminalCommand(p *project.Project, cmd string) *DockerCmd {
+func (dc *DockerCmd) TerminalCommand(p *project.Project, cmd []string) *DockerCmd {
 	dc.DockerComposeCommand()
 	dc.WithProjectName(p)
 
 	dc.WithArgs("exec", "-it", p.ServiceName)
-	dc.WithArgs(cmd)
+	dc.WithArgs(cmd...)
 
 	return dc
 }
