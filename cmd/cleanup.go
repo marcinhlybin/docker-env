@@ -7,9 +7,16 @@ import (
 
 var CleanupCommand = cli.Command{
 	Name:        "cleanup",
-	Usage:       "Cleanup entire project",
-	Description: `Remove everything related to the project.`,
+	Usage:       "Removes all projects",
+	Description: `Removes projects and images for this repository. Only images associated with existing projects will be removed.`,
 	Action:      cleanupAction,
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:    "with-images",
+			Aliases: []string{"i", "include-images"},
+			Usage:   "also remove images",
+		},
+	},
 }
 
 func cleanupAction(c *cli.Context) error {
@@ -22,5 +29,7 @@ func cleanupAction(c *cli.Context) error {
 
 	logger.SetPrefix(ctx.Config.ComposeProjectName)
 
-	return ctx.Registry.Cleanup()
+	includeImages := c.Bool("with-images")
+
+	return ctx.Registry.Cleanup(includeImages)
 }

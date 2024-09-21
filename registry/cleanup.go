@@ -9,31 +9,46 @@ import (
 	"github.com/marcinhlybin/docker-env/project"
 )
 
-func (reg *DockerProjectRegistry) Cleanup() error {
-	logger.Info("Cleaning up")
+// Cleanup removes all projects and images
+func (reg *DockerProjectRegistry) Cleanup(includeImages bool) error {
+	message := "Cleaning up"
+	if !includeImages {
+		message += " (without images)"
+	}
+	logger.Info(message)
+
+	// Fetch projects
 	includeStopped := true
 	projects, err := reg.fetchProjects(includeStopped)
 	if err != nil {
 		return err
 	}
 
-	// Fetch images from existing projects
-	images, fetchImagesErr := reg.fetchImagesForProjects(projects)
-
-	// Remove projects and images
-	removeProjectsErr := reg.removeProjects(projects)
-	removeImagesErr := reg.removeImages(images)
-
-	// Check for errors
 	var errors []string
-	if fetchImagesErr != nil {
-		errors = append(errors, fetchImagesErr.Error())
+	var images []*DockerComposeImages
+
+	// Fetch images
+	if includeImages {
+		images, err = reg.fetchImagesForProjects(projects)
+		if err != nil {
+			errors = append(errors, err.Error())
+		}
 	}
-	if removeProjectsErr != nil {
-		errors = append(errors, removeProjectsErr.Error())
+
+	// Order of removal is important, first projects, then images
+	// and to get images we need to have projects
+	// Remove projects
+	err = reg.removeProjects(projects)
+	if err != nil {
+		errors = append(errors, err.Error())
 	}
-	if removeImagesErr != nil {
-		errors = append(errors, removeImagesErr.Error())
+
+	// Remove images
+	if includeImages {
+		err = reg.removeImages(images)
+		if err != nil {
+			errors = append(errors, err.Error())
+		}
 	}
 
 	if len(errors) > 0 {
