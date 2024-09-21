@@ -33,7 +33,7 @@ Supported hooks are:
 
 By default **docker-env** uses `docker-compose.yml` for service definition. The configuration can be extended with `docker-compose.override.yml`.
 
-Container name in service definition **must be** prefixed with compose project name:
+Container name in service definition **must be prefixed** with `$COMPOSE_PROJECT_NAME-`:
 
 ```
 services:
