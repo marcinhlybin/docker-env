@@ -68,7 +68,7 @@ aws_region: us-east-1
 	defer os.Remove(overridePath)
 
 	// Temporarily override the default override config path
-	config.OverrideConfigPath = overridePath
+	config.ConfigPathOverride = overridePath
 
 	cfg := config.NewConfig()
 	err := cfg.LoadConfig(configPath)

@@ -1,7 +1,9 @@
 package docker
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -18,6 +20,8 @@ type DockerCmd struct {
 }
 
 func NewDockerCmd(cfg *config.Config) *DockerCmd {
+	logger.ShowCommands(cfg.ShowCommands)
+
 	return &DockerCmd{
 		Config: cfg,
 		Cmd:    "docker",
@@ -39,6 +43,12 @@ func (dc *DockerCmd) DockerComposeCommand() *DockerCmd {
 		"--profile", dc.Config.ComposeDefaultProfile,
 		"--progress", "tty"}
 
+	// Add the override file if it exists
+	if _, err := os.Stat(dc.Config.ComposeFileOverride); err == nil {
+		dc.Args = append(dc.Args, "--file", dc.Config.ComposeFileOverride)
+	}
+
+	// Add the env files
 	for _, envFile := range dc.Config.EnvFiles {
 		dc.Args = append(dc.Args, "--env-file", envFile)
 	}
@@ -82,10 +92,15 @@ func (dc *DockerCmd) Execute() error {
 
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+
+	// Capture stderr output
+	var stderrBuf bytes.Buffer
+	cmd.Stderr = io.MultiWriter(os.Stderr, &stderrBuf)
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("error running docker command")
+		// Log the captured stderr output
+		logger.Error(stderrBuf.String(), nil)
+		return fmt.Errorf("error running docker command: %w", err)
 	}
 
 	return nil

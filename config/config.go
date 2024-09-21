@@ -11,13 +11,14 @@ import (
 // Defaults for the config
 var (
 	ConfigPath         = ".docker-env/config.yaml"
-	OverrideConfigPath = ".docker-env/config.override.yaml"
+	ConfigPathOverride = ".docker-env/config.override.yaml"
 )
 
 type Config struct {
 	Path                   string
 	ComposeProjectName     string   `yaml:"compose_project_name"`
 	ComposeFile            string   `yaml:"compose_file"`
+	ComposeFileOverride    string   `yaml:"compose_file_override"`
 	ComposeDefaultProfile  string   `yaml:"compose_default_profile"`
 	ComposeSidecarProfile  string   `yaml:"compose_sidecar_profile"`
 	EnvFiles               []string `yaml:"env_files"`
@@ -32,11 +33,13 @@ type Config struct {
 	PostStartScript        string   `yaml:"post_start_script"`
 	PostStopScript         string   `yaml:"post_stop_script"`
 	RequiredVars           []string `yaml:"required_vars"`
+	ShowCommands           bool     `yaml:"show_commands"`
 }
 
 func NewConfig() *Config {
 	return &Config{
 		ComposeFile:            "docker-compose.yml",
+		ComposeFileOverride:    "docker-compose.override.yml",
 		ComposeDefaultProfile:  "app",
 		ComposeSidecarProfile:  "sidecar",
 		EnvFiles:               []string{},
@@ -48,6 +51,7 @@ func NewConfig() *Config {
 		PostStartScript:        "",
 		PostStopScript:         "",
 		RequiredVars:           []string{},
+		ShowCommands:           true,
 	}
 }
 
@@ -62,8 +66,8 @@ func (cfg *Config) LoadConfig(path string) error {
 	}
 
 	// Read override config file if it exists
-	if _, err := os.Stat(OverrideConfigPath); err == nil {
-		if err := readConfigFile(OverrideConfigPath, cfg); err != nil {
+	if _, err := os.Stat(ConfigPathOverride); err == nil {
+		if err := readConfigFile(ConfigPathOverride, cfg); err != nil {
 			return err
 		}
 	}
@@ -113,5 +117,7 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("Terminal default command:", c.TerminalDefaultCommand)
 	fmt.Println("VSCode default service:", c.VscodeDefaultService)
 	fmt.Println("VSCode default directory:", c.VscodeDefaultDir)
+	fmt.Println()
+	fmt.Println("Show commands:", c.ShowCommands)
 	return nil
 }
