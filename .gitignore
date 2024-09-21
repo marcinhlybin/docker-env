@@ -25,7 +25,9 @@ go.work.sum
 .env
 
 
-.docker-env
 .vscode
 docker-compose.yml
 docker-env
+
+
+.DS_Store

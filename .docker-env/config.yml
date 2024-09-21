@@ -1,0 +1,48 @@
+### Docker-env configuration file
+
+# Docker compose projects and their containers will be prefixed with this name
+# Only alphanumeric characters and underscores are allowed, no hyphens
+# Make sure to name service names in the docker-compose.yml file
+# using "$COMPOSE_PROJECT_NAME-" prefix
+compose_project_name: docker_env
+
+# Docker compose configuration
+compose_file: docker-compose.yml
+compose_file_override: docker-compose.override.yml
+
+# Profiles are used to distinguish between default startup services
+# and services that are only started when explicitly requested by the user
+# so called sidecar services
+compose_default_profile: app
+compose_sidecar_profile: sidecar
+
+# Debug options
+show_commands: true
+
+# Env files to load environmental variables used in the docker-compose.yml file
+# for substitution in the services section
+env_files:
+  - .env
+
+# Check for following environment variables in env files
+required_vars:
+  - GITHUB_USER
+  - GITHUB_TOKEN
+  - AWS_ACCESS_KEY_ID
+  - AWS_SECRET_ACCESS_KEY
+
+# AWS registry
+aws_login: false
+aws_region: eu-central-1
+aws_repository: 1234567890.dkr.ecr.eu-central-1.amazonaws.com
+
+# Command defaults
+terminal_default_service: app
+terminal_default_command: /bin/bash
+vscode_default_service: app
+vscode_default_dir: /app
+
+# Scripts to run before and after
+pre_start_script: .docker-env/pre-start.sh
+post_start_script: .docker-env/post-start.sh
+post_stop_script: .docker-env/post-stop.sh
