@@ -35,7 +35,7 @@ func ShowCommands(show bool) {
 func Info(format string, args ...any) {
 	pterm.Info.Prefix = pterm.Prefix{
 		Text:  infoPrefixText,
-		Style: pterm.NewStyle(pterm.BgGreen, pterm.FgWhite),
+		Style: pterm.NewStyle(pterm.BgGreen, pterm.FgBlack),
 	}
 	pterm.Info.MessageStyle = pterm.NewStyle(pterm.FgDefault)
 	msg := fmt.Sprintf(format, args...)
@@ -47,6 +47,7 @@ func Warning(format string, args ...any) {
 		Text:  warningPrefixText,
 		Style: pterm.NewStyle(pterm.BgYellow, pterm.FgBlack),
 	}
+	pterm.Info.MessageStyle = pterm.NewStyle(pterm.FgYellow)
 	msg := fmt.Sprintf(format, args...)
 	pterm.Warning.Println(msg)
 }
@@ -54,8 +55,9 @@ func Warning(format string, args ...any) {
 func Debug(format string, args ...any) {
 	pterm.Debug.Prefix = pterm.Prefix{
 		Text:  debugPrefixText,
-		Style: pterm.NewStyle(pterm.BgLightRed, pterm.FgBlack),
+		Style: pterm.NewStyle(pterm.BgGray, pterm.FgBlack),
 	}
+	pterm.Info.MessageStyle = pterm.NewStyle(pterm.FgDefault)
 	msg := fmt.Sprintf(format, args...)
 	pterm.Debug.Println(msg)
 }
@@ -65,6 +67,7 @@ func Error(format string, args ...any) {
 		Text:  errorPrefixText,
 		Style: pterm.NewStyle(pterm.BgRed, pterm.FgLightWhite),
 	}
+	pterm.Error.MessageStyle = pterm.NewStyle(pterm.FgRed)
 	msg := fmt.Sprintf(format, args...)
 	pterm.Error.Println(msg)
 }
@@ -75,8 +78,8 @@ func Execute(msg string) {
 	}
 	pterm.Info.Prefix = pterm.Prefix{
 		Text:  executePrefixText,
-		Style: pterm.NewStyle(pterm.BgGreen, pterm.FgWhite),
+		Style: pterm.NewStyle(pterm.BgGreen, pterm.FgBlack),
 	}
-	pterm.Info.MessageStyle = pterm.NewStyle(pterm.BgDefault, pterm.FgGray)
+	pterm.Info.MessageStyle = pterm.NewStyle(pterm.FgGray)
 	pterm.Info.Println(msg)
 }
