@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/marcinhlybin/docker-env/addons"
 	"github.com/marcinhlybin/docker-env/config"
 	"github.com/marcinhlybin/docker-env/docker"
 	"github.com/marcinhlybin/docker-env/helpers"
@@ -100,12 +99,8 @@ func (reg *DockerProjectRegistry) StopProject(p *project.Project) error {
 	}
 
 	dc := reg.dockerCmd.StopProjectCommand(p)
-	err = dc.Execute()
-	if err != nil {
-		return err
-	}
 
-	return addons.RunScript("post-stop", reg.Config.PostStopScript)
+	return dc.Execute()
 }
 
 func (reg *DockerProjectRegistry) RestartProject(p *project.Project) error {

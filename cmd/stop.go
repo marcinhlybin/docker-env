@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/addons"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -35,5 +36,11 @@ func stopAction(c *cli.Context) error {
 	}
 	logger.SetPrefix(ctx.Project.Name)
 
-	return ctx.Registry.StopProject(ctx.Project)
+	if err := ctx.Registry.StopProject(ctx.Project); err != nil {
+		return err
+	}
+
+	// Run post-stop script
+	return addons.RunScript("post-stop", ctx.Config.PostStopScript)
+
 }
