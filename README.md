@@ -22,7 +22,7 @@ In short, docker-env abstracts common docker-compose tasks, allowing you to focu
 
 ## Hooks
 
-Sample hooks can be found in `.docker-env/` directory.
+Sample hooks to generate SSL certs and set up ssh-agent can be found in `.docker-env/` directory.
 
 Supported hooks are:
 * pre-start
