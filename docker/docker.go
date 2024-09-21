@@ -99,7 +99,7 @@ func (dc *DockerCmd) Execute() error {
 
 	if err := cmd.Run(); err != nil {
 		// Log the captured stderr output
-		logger.Error(stderrBuf.String(), nil)
+		logger.Error(stderrBuf.String())
 		return fmt.Errorf("error running docker command: %w", err)
 	}
 

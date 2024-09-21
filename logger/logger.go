@@ -2,7 +2,6 @@ package logger
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/pterm/pterm"
 )
@@ -33,13 +32,14 @@ func ShowCommands(show bool) {
 	executeEnabled = show
 }
 
-func Info(msgs ...string) {
+func Info(format string, args ...any) {
 	pterm.Info.Prefix = pterm.Prefix{
 		Text:  infoPrefixText,
 		Style: pterm.NewStyle(pterm.BgGreen, pterm.FgWhite),
 	}
 	pterm.Info.MessageStyle = pterm.NewStyle(pterm.FgDefault)
-	pterm.Info.Println(strings.Join(msgs, " "))
+	msg := fmt.Sprintf(format, args...)
+	pterm.Info.Println(msg)
 }
 
 func Warning(format string, args ...any) {
@@ -60,12 +60,13 @@ func Debug(format string, args ...any) {
 	pterm.Debug.Println(msg)
 }
 
-func Error(msg string, err error) {
+func Error(format string, args ...any) {
 	pterm.Error.Prefix = pterm.Prefix{
 		Text:  errorPrefixText,
 		Style: pterm.NewStyle(pterm.BgRed, pterm.FgLightWhite),
 	}
-	pterm.Error.Println(msg, err)
+	msg := fmt.Sprintf(format, args...)
+	pterm.Error.Println(msg)
 }
 
 func Execute(msg string) {

@@ -60,7 +60,7 @@ func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, upd
 	}
 
 	// Start project
-	logger.Info("Starting", p.String())
+	logger.Info("Starting %s", p.String())
 	dc := reg.dockerCmd.CreateAndStartProjectCommand(p, recreate, update)
 	if err := dc.Execute(); err != nil {
 		return err
@@ -96,7 +96,7 @@ func (reg *DockerProjectRegistry) stopOtherActiveProjects(p *project.Project) er
 }
 
 func (reg *DockerProjectRegistry) StopProject(p *project.Project) error {
-	logger.Info("Stopping", p.String())
+	logger.Info("Stopping %s", p.String())
 
 	exists, err := reg.ProjectExists(p)
 	if err != nil {
@@ -121,7 +121,7 @@ func (reg *DockerProjectRegistry) RestartProject(p *project.Project) error {
 		return err
 	}
 
-	logger.Info("Restarting", p.String())
+	logger.Info("Restarting %s", p.String())
 
 	exists, err := reg.ProjectExists(p)
 	if err != nil {
@@ -138,7 +138,7 @@ func (reg *DockerProjectRegistry) RestartProject(p *project.Project) error {
 }
 
 func (reg *DockerProjectRegistry) RemoveProject(p *project.Project) error {
-	logger.Info("Removing", p.String())
+	logger.Info("Removing %s", p.String())
 
 	exists, err := reg.ProjectExists(p)
 	if err != nil {
@@ -154,13 +154,13 @@ func (reg *DockerProjectRegistry) RemoveProject(p *project.Project) error {
 }
 
 func (reg *DockerProjectRegistry) BuildProject(p *project.Project, noCache bool) error {
-	logger.Info("Building", p.String())
+	logger.Info("Building %s", p.String())
 	dc := reg.dockerCmd.BuildProjectCommand(p, noCache)
 	return dc.Execute()
 }
 
 func (reg *DockerProjectRegistry) Terminal(p *project.Project, cmd string) error {
-	logger.Info("Running terminal for", p.String())
+	logger.Info("Running terminal for %s", p.String())
 
 	// Set default service
 	if !p.IsServiceDefined() {
@@ -178,7 +178,7 @@ func (reg *DockerProjectRegistry) Terminal(p *project.Project, cmd string) error
 }
 
 func (reg *DockerProjectRegistry) Code(p *project.Project, dir string) error {
-	logger.Info("Opening code editor for", p.String())
+	logger.Info("Opening code editor for %s", p.String())
 
 	// Set default service
 	if !p.IsServiceDefined() {

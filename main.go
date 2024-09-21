@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/marcinhlybin/docker-env/cmd"
+	"github.com/marcinhlybin/docker-env/helpers"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/marcinhlybin/docker-env/version"
 	"github.com/urfave/cli/v2"
@@ -59,7 +60,7 @@ If environment name is not specified current branch name is used.`,
 
 	err := app.Run(os.Args)
 	if err != nil {
-		logger.Error("Command failed:", err)
+		logger.Error("%s", helpers.ToTitle(err.Error()))
 		os.Exit(1)
 	}
 }

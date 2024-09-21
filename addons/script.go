@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/marcinhlybin/docker-env/helpers"
 	"github.com/marcinhlybin/docker-env/logger"
 )
 
@@ -38,7 +37,7 @@ func (s *Script) Run() error {
 		return fmt.Errorf("cannot open %s script '%s': %w", s.Name, s.Path, err)
 	}
 
-	logger.Info(helpers.ToTitle(s.Name), "scripts")
+	logger.Info("Running %s scripts", s.Name)
 	return s.execute()
 }
 
@@ -74,13 +73,13 @@ func (s *Script) execute() error {
 
 	go func() {
 		for scannerErr.Scan() {
-			logger.Error(scannerErr.Text(), nil)
+			logger.Error(scannerErr.Text())
 		}
 	}()
 
 	// Wait for the command to finish
 	if err := cmd.Wait(); err != nil {
-		return fmt.Errorf("command failed: %w", err)
+		return fmt.Errorf("script execution failed: %w", err)
 	}
 
 	return nil
