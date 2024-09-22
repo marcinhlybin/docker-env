@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/marcinhlybin/docker-env/helpers"
+	"github.com/marcinhlybin/docker-env/docker"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/marcinhlybin/docker-env/project"
 )
@@ -25,11 +25,11 @@ func (reg *DockerProjectRegistry) Cleanup(includeImages bool) error {
 	}
 
 	var errors []string
-	var images []*DockerComposeImages
+	var images []*docker.Image
 
 	// Fetch images
 	if includeImages {
-		images, err = reg.fetchImagesForProjects(projects)
+		images, err = reg.fetchImagesForMultipleProjects(projects)
 		if err != nil {
 			errors = append(errors, err.Error())
 		}
@@ -58,11 +58,11 @@ func (reg *DockerProjectRegistry) Cleanup(includeImages bool) error {
 	return nil
 }
 
-func (reg *DockerProjectRegistry) fetchImagesForProjects(projects []*project.Project) ([]*DockerComposeImages, error) {
-	var images []*DockerComposeImages
+func (reg *DockerProjectRegistry) fetchImagesForMultipleProjects(projects []*project.Project) ([]*docker.Image, error) {
+	var images []*docker.Image
 	isErr := false
 	for _, p := range projects {
-		projectImages, err := reg.fetchProjectImages(p)
+		projectImages, err := reg.fetchImages(p)
 		if err != nil {
 			isErr = true
 			logger.Warning("Could not fetch images for %s: %v", p.String(), err)
@@ -76,46 +76,4 @@ func (reg *DockerProjectRegistry) fetchImagesForProjects(projects []*project.Pro
 	}
 
 	return images, nil
-}
-
-func (reg *DockerProjectRegistry) removeProjects(projects []*project.Project) error {
-	isErr := false
-	for _, p := range projects {
-		dc := reg.dockerCmd.RemoveProjectCommand(p)
-		err := dc.Execute()
-		if err != nil {
-			isErr = true
-			logger.Warning("Could not remove %s", p.String())
-			continue
-		}
-	}
-
-	if isErr {
-		return fmt.Errorf("one or more projects could not be removed")
-	}
-
-	return nil
-}
-
-func (reg *DockerProjectRegistry) removeImages(images []*DockerComposeImages) error {
-	var removedIds []string
-	isErr := false
-	for _, img := range images {
-		if helpers.Contains(removedIds, img.Id) {
-			continue
-		}
-		removedIds = append(removedIds, img.Id)
-		dc := reg.dockerCmd.RemoveImageCommand(img.Id)
-		err := dc.Execute()
-		if err != nil {
-			isErr = true
-			logger.Warning("Could not remove image %s", img.Id)
-		}
-	}
-
-	if isErr {
-		return fmt.Errorf("one or more images could not be removed")
-	}
-
-	return nil
 }

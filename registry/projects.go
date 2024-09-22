@@ -76,3 +76,22 @@ func (reg *DockerProjectRegistry) createProjectsFromJson(jsonString string) ([]*
 func (reg *DockerProjectRegistry) trimComposeProjectNamePrefix(name string) string {
 	return strings.TrimPrefix(name, reg.Config.ComposeProjectName+"-")
 }
+
+func (reg *DockerProjectRegistry) removeProjects(projects []*project.Project) error {
+	isErr := false
+	for _, p := range projects {
+		dc := reg.dockerCmd.RemoveProjectCommand(p)
+		err := dc.Execute()
+		if err != nil {
+			isErr = true
+			logger.Warning("Could not remove %s", p.String())
+			continue
+		}
+	}
+
+	if isErr {
+		return fmt.Errorf("one or more projects could not be removed")
+	}
+
+	return nil
+}
