@@ -50,8 +50,7 @@ func startAction(c *cli.Context) error {
 
 	logger.SetPrefix(ctx.Project.Name)
 
-	// Run pre-start script
-	if err := ctx.PreStartHook(); err != nil {
+	if err := ctx.RunPreStartHook(); err != nil {
 		return err
 	}
 
@@ -59,6 +58,5 @@ func startAction(c *cli.Context) error {
 		return err
 	}
 
-	// Run post-start script
-	return ctx.PostStartHook()
+	return ctx.RunPostStartHook()
 }

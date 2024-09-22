@@ -39,7 +39,6 @@ func stopAction(c *cli.Context) error {
 		return err
 	}
 
-	// Run post-stop script
-	return ctx.PostStopHook()
+	return ctx.RunPostStopHook()
 
 }

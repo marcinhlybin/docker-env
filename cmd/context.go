@@ -57,17 +57,17 @@ func initializeRegistry(cfg *config.Config) (*registry.DockerProjectRegistry, er
 	return registry.NewDockerProjectRegistry(cfg), nil
 }
 
-func (ctx *AppContext) PreStartHook() error {
+func (ctx *AppContext) RunPreStartHook() error {
 	hook := addons.NewPreStartHook(ctx.Config.PreStartHook, ctx.Project.Name, ctx.Project.ServiceName)
 	return hook.Run()
 }
 
-func (ctx *AppContext) PostStartHook() error {
+func (ctx *AppContext) RunPostStartHook() error {
 	hook := addons.NewPostStartHook(ctx.Config.PostStartHook, ctx.Project.Name, ctx.Project.ServiceName)
 	return hook.Run()
 }
 
-func (ctx *AppContext) PostStopHook() error {
+func (ctx *AppContext) RunPostStopHook() error {
 	hook := addons.NewPostStopHook(ctx.Config.PostStopHook, ctx.Project.Name, ctx.Project.ServiceName)
 	return hook.Run()
 }
