@@ -225,6 +225,7 @@ Sample hooks can be found in `.docker-env/` directory:
 Run `make` to build a binary to the current directory.
 
 ```
+brew install go
 make test
 make install
 ```
