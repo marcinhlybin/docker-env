@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/marcinhlybin/docker-env/addons"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -52,7 +51,7 @@ func startAction(c *cli.Context) error {
 	logger.SetPrefix(ctx.Project.Name)
 
 	// Run pre-start script
-	if err := addons.RunScript("pre-start", ctx.Config.PreStartScript); err != nil {
+	if err := ctx.PreStartHook(); err != nil {
 		return err
 	}
 
@@ -61,5 +60,5 @@ func startAction(c *cli.Context) error {
 	}
 
 	// Run post-start script
-	return addons.RunScript("post-start", ctx.Config.PostStartScript)
+	return ctx.PostStartHook()
 }

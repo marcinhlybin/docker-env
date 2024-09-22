@@ -6,6 +6,10 @@
 # Exit on error
 set -e
 
+# Args passed to the script
+PROJECT_NAME="$1"
+SERVICE_NAME="$2"
+
 CERTS_DIR="dockerfiles/nginx/certs"
 CERT_NAME="docker-self-signed"
 CERT_DAYS="100"

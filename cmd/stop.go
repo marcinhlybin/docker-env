@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/marcinhlybin/docker-env/addons"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -41,6 +40,6 @@ func stopAction(c *cli.Context) error {
 	}
 
 	// Run post-stop script
-	return addons.RunScript("post-stop", ctx.Config.PostStopScript)
+	return ctx.PostStopHook()
 
 }

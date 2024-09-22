@@ -29,9 +29,9 @@ type Config struct {
 	AwsLogin               bool     `yaml:"aws_login"`
 	AwsRegion              string   `yaml:"aws_region"`
 	AwsRepository          string   `yaml:"aws_repository"`
-	PreStartScript         string   `yaml:"pre_start_script"`
-	PostStartScript        string   `yaml:"post_start_script"`
-	PostStopScript         string   `yaml:"post_stop_script"`
+	PreStartHook           string   `yaml:"pre_start_hook"`
+	PostStartHook          string   `yaml:"post_start_hook"`
+	PostStopHook           string   `yaml:"post_stop_hook"`
 	RequiredVars           []string `yaml:"required_vars"`
 	ShowCommands           bool     `yaml:"show_commands"`
 }
@@ -47,9 +47,9 @@ func NewConfig() *Config {
 		TerminalDefaultCommand: "/bin/bash",
 		VscodeDefaultService:   "app",
 		VscodeDefaultDir:       "/",
-		PreStartScript:         "",
-		PostStartScript:        "",
-		PostStopScript:         "",
+		PreStartHook:           "",
+		PostStartHook:          "",
+		PostStopHook:           "",
 		RequiredVars:           []string{},
 		ShowCommands:           true,
 	}
@@ -105,9 +105,9 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("Env files:", strings.Join(c.EnvFiles, ", "))
 	fmt.Println("Required vars:", strings.Join(c.RequiredVars, ", "))
 	fmt.Println()
-	fmt.Println("Pre-start script:", c.PreStartScript)
-	fmt.Println("Post-start script:", c.PostStartScript)
-	fmt.Println("Post-stop script:", c.PostStopScript)
+	fmt.Println("Pre-start hook:", c.PreStartHook)
+	fmt.Println("Post-start hook:", c.PostStartHook)
+	fmt.Println("Post-stop hook:", c.PostStopHook)
 	fmt.Println()
 	fmt.Println("AWS login:", c.AwsLogin)
 	fmt.Println("AWS region:", c.AwsRegion)

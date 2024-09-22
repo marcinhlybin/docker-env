@@ -215,6 +215,7 @@ Supported hooks are:
 * post-start
 * post-stop
 
+Arguments passed to the hooks are `PROJECT_NAME` and `SERVICE_NAME` as positional arguments.
 
 ## Building
 
@@ -226,3 +227,37 @@ make install
 ```
 
 Installs into `/usr/local/bin`. Sudo password required.
+
+## Troubleshooting
+
+### Cannot connecto to the Docker daemon
+
+Docker desktop is running but I keep receiving error message
+
+```
+ ERROR  Error running docker command: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+```
+
+**Solution:** Point `DOCKER_HOST` to docker socket in your home directory:
+
+```
+export DOCKER_HOST="unix:///$HOME/.docker/run/docker.sock"
+```
+
+or in Docker Desktop in Settings -> Advanced select `Allow the default Docker socket to be used (requires password)`
+
+### Pre start hooks from pre-start.d directory don't run
+
+If you use this `pre-start.sh` hook:
+
+```
+# Run pre-start scripts
+for f in .docker-env/pre-start.d/*; do
+  if [ -x "$f" ]; then
+    echo "(pre-start) Running $f with args $@"
+    "$f" "$@"
+  fi
+done
+```
+
+it looks for scripts in `pre-start.d` directory and checks for executable flag. Set proper permissions with `chmod 755 .docker-env/pre-start.d/*.sh`.

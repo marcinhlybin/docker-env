@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/addons"
 	"github.com/marcinhlybin/docker-env/config"
 	"github.com/marcinhlybin/docker-env/project"
 	"github.com/marcinhlybin/docker-env/registry"
@@ -54,4 +55,19 @@ func initializeProject(c *cli.Context) (*project.Project, error) {
 
 func initializeRegistry(cfg *config.Config) (*registry.DockerProjectRegistry, error) {
 	return registry.NewDockerProjectRegistry(cfg), nil
+}
+
+func (ctx *AppContext) PreStartHook() error {
+	hook := addons.NewPreStartHook(ctx.Config.PreStartHook, ctx.Project.Name, ctx.Project.ServiceName)
+	return hook.Run()
+}
+
+func (ctx *AppContext) PostStartHook() error {
+	hook := addons.NewPostStartHook(ctx.Config.PostStartHook, ctx.Project.Name, ctx.Project.ServiceName)
+	return hook.Run()
+}
+
+func (ctx *AppContext) PostStopHook() error {
+	hook := addons.NewPostStopHook(ctx.Config.PostStopHook, ctx.Project.Name, ctx.Project.ServiceName)
+	return hook.Run()
 }

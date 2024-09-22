@@ -43,6 +43,6 @@ vscode_default_service: app
 vscode_default_dir: /app
 
 # Scripts to run before and after
-pre_start_script: .docker-env/pre-start.sh
-post_start_script: .docker-env/post-start.sh
-post_stop_script: .docker-env/post-stop.sh
+pre_start_hook: .docker-env/pre-start.sh
+post_start_hook: .docker-env/post-start.sh
+post_stop_hook: .docker-env/post-stop.sh

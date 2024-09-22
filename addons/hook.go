@@ -9,40 +9,48 @@ import (
 	"github.com/marcinhlybin/docker-env/logger"
 )
 
-type Script struct {
+type Hook struct {
 	Name string
 	Path string
+	Args []string
 }
 
-func NewScript(name, path string) *Script {
-	return &Script{
+func NewHook(name string, path string, args ...string) *Hook {
+	return &Hook{
 		Name: name,
 		Path: path,
+		Args: args,
 	}
 }
 
-// Helper function to run a script
-func RunScript(name, path string) error {
-	s := NewScript(name, path)
-	return s.Run()
+func NewPreStartHook(path string, args ...string) *Hook {
+	return NewHook("pre-start", path, args...)
 }
 
-func (s *Script) Run() error {
+func NewPostStartHook(path string, args ...string) *Hook {
+	return NewHook("post-start", path, args...)
+}
+
+func NewPostStopHook(path string, args ...string) *Hook {
+	return NewHook("post-stop", path, args...)
+}
+
+func (s *Hook) Run() error {
 	if s.Path == "" {
 		return nil
 	}
 
-	// Check if script exists
+	// Check if hook exists
 	if _, err := os.Stat(s.Path); err != nil {
-		return fmt.Errorf("cannot open %s script '%s': %w", s.Name, s.Path, err)
+		return fmt.Errorf("cannot open %s hook '%s': %w", s.Name, s.Path, err)
 	}
 
-	logger.Info("Running %s scripts", s.Name)
-	return s.execute()
+	logger.Info("Running %s hook", s.Name)
+	return s.executeCommand()
 }
 
-func (s *Script) execute() error {
-	cmd := exec.Command("/bin/sh", s.Path)
+func (s *Hook) executeCommand() error {
+	cmd := exec.Command(s.Path, s.Args...)
 
 	// Get the output pipe
 	stdout, err := cmd.StdoutPipe()
@@ -57,7 +65,7 @@ func (s *Script) execute() error {
 
 	// Start the command
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("failed to start command: %w", err)
+		return fmt.Errorf("failed to execute command: %w", err)
 	}
 
 	// Create a scanner to read the output line by line
@@ -79,7 +87,7 @@ func (s *Script) execute() error {
 
 	// Wait for the command to finish
 	if err := cmd.Wait(); err != nil {
-		return fmt.Errorf("script execution failed: %w", err)
+		return fmt.Errorf("%s hook execution failed: %w", s.Name, err)
 	}
 
 	return nil

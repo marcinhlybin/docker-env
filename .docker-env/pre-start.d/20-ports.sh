@@ -6,6 +6,10 @@
 # Exit on error
 set -e
 
+# Args passed to the script
+PROJECT_NAME="$1"
+SERVICE_NAME="$2"
+
 PORTS="80 443"
 
 function port_is_open {
