@@ -42,10 +42,6 @@ func (reg *DockerProjectRegistry) ProjectExists(p *project.Project) (bool, error
 }
 
 func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, update bool) error {
-	if err := reg.stopOtherActiveProjects(p); err != nil {
-		return err
-	}
-
 	// Login to AWS registry
 	if reg.Config.AwsLogin {
 		logger.Info("Logging into AWS registry")
@@ -61,7 +57,7 @@ func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, upd
 	return dc.Execute()
 }
 
-func (reg *DockerProjectRegistry) stopOtherActiveProjects(p *project.Project) error {
+func (reg *DockerProjectRegistry) StopOtherActiveProjects(p *project.Project) error {
 	logger.Info("Stopping other active projects")
 	includeStopped := false
 	activeProjects, err := reg.fetchProjects(includeStopped)
@@ -104,7 +100,7 @@ func (reg *DockerProjectRegistry) StopProject(p *project.Project) error {
 }
 
 func (reg *DockerProjectRegistry) RestartProject(p *project.Project) error {
-	if err := reg.stopOtherActiveProjects(p); err != nil {
+	if err := reg.StopOtherActiveProjects(p); err != nil {
 		return err
 	}
 

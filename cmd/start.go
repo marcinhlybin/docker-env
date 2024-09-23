@@ -50,6 +50,10 @@ func startAction(c *cli.Context) error {
 
 	logger.SetPrefix(ctx.Project.Name)
 
+	if err := ctx.Registry.StopOtherActiveProjects(ctx.Project); err != nil {
+		return err
+	}
+
 	if err := ctx.RunPreStartHook(); err != nil {
 		return err
 	}

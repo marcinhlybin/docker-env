@@ -45,7 +45,7 @@ func (s *Hook) Run() error {
 		return fmt.Errorf("cannot open %s hook '%s': %w", s.Name, s.Path, err)
 	}
 
-	logger.Info("Running %s hook", s.Name)
+	logger.Info("Running %s hooks", s.Name)
 	return s.executeCommand()
 }
 
@@ -73,9 +73,10 @@ func (s *Hook) executeCommand() error {
 	scannerErr := bufio.NewScanner(stderr)
 
 	// Read and print each line with the prefix
+	hookOutputPrefix := "  "
 	go func() {
 		for scanner.Scan() {
-			logger.Info(scanner.Text())
+			logger.Info("%s%s", hookOutputPrefix, scanner.Text())
 		}
 	}()
 

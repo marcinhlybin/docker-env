@@ -22,11 +22,11 @@ func (reg *DockerProjectRegistry) ListProjects(includeStopped bool) error {
 	}
 
 	for _, p := range projects {
-		runningIndicator := ""
 		if includeStopped && p.IsRunning() {
-			runningIndicator = "*"
+			fmt.Println(p.Name, "*")
+		} else {
+			fmt.Println(p.Name)
 		}
-		fmt.Println(p.Name, runningIndicator)
 	}
 
 	return nil
