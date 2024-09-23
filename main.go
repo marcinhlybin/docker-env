@@ -28,6 +28,7 @@ If environment name is not specified current branch name is used.`,
 			&cmd.InfoCommand,
 			&cmd.TerminalCommand,
 			&cmd.CodeCommand,
+			&cmd.VersionCommand,
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -56,7 +57,15 @@ If environment name is not specified current branch name is used.`,
 		},
 	}
 
-	cli.VersionPrinter = version.VersionPrinter
+	// Version
+	cli.VersionFlag = &cli.BoolFlag{
+		Name:    "version",
+		Aliases: []string{"v"},
+		Usage:   "show version string, alias for 'version --short'",
+	}
+	cli.VersionPrinter = func(c *cli.Context) {
+		version.PrintVersionString()
+	}
 
 	err := app.Run(os.Args)
 	if err != nil {
