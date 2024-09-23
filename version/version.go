@@ -2,8 +2,6 @@ package version
 
 import (
 	"fmt"
-
-	"github.com/urfave/cli/v2"
 )
 
 const Version = "1.0"
@@ -14,8 +12,20 @@ var (
 	CommitHash = ""
 )
 
-func VersionPrinter(c *cli.Context) {
+func PrintFullVersion() {
 	fmt.Printf("Version: %s\n", Version)
 	fmt.Printf("Build date: %s\n", BuildDate)
 	fmt.Printf("Commit hash: %s\n", CommitHash)
+}
+
+func PrintVersionString() {
+	fmt.Println(Version)
+}
+
+func PrintBuildDate() {
+	fmt.Println(BuildDate)
+}
+
+func PrintCommitHash() {
+	fmt.Println(CommitHash)
 }
