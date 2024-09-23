@@ -2,18 +2,59 @@ package logger
 
 import (
 	"fmt"
+	"io"
+	"os"
 
 	"github.com/pterm/pterm"
 )
 
+var isQuiet bool
+var isQuieter bool
+var showExecutedCommands bool
+
+// Default prefix texts
 var (
 	infoPrefixText    = "INFO"
 	executePrefixText = "EXECUTE"
 	warningPrefixText = "WARNING"
 	errorPrefixText   = "ERROR"
 	debugPrefixText   = "DEBUG"
-	executeEnabled    = true
 )
+
+// Stdin returns os.Stdin
+func Stdin() *os.File {
+	return os.Stdin
+}
+
+// Stdout returns os.Stdout or os.DevNull depending on the verbosity level
+func Stdout() io.Writer {
+	if isQuieter {
+		return io.Discard
+	}
+	return os.Stdout
+}
+
+// Stderr returns os.Stderr or os.DevNull depending on the verbosity level
+func Stderr() io.Writer {
+	if isQuieter {
+		return io.Discard
+	}
+	return os.Stderr
+}
+
+// Disables info messages
+func SetQuiet(quiet bool) {
+	isQuiet = quiet
+}
+
+// Disables commands output
+func SetQuieter(quiet bool) {
+	if quiet {
+		SetQuiet(quiet)
+	}
+	isQuieter = quiet
+
+}
 
 func SetPrefix(prefix string) {
 	infoPrefixText = prefix
@@ -28,11 +69,14 @@ func SetDebug(debug bool) {
 	}
 }
 
-func ShowCommands(show bool) {
-	executeEnabled = show
+func ShowExecutedCommands(showCommands bool) {
+	showExecutedCommands = showCommands
 }
 
 func Info(format string, args ...any) {
+	if isQuiet {
+		return
+	}
 	pterm.Info.Prefix = pterm.Prefix{
 		Text:  infoPrefixText,
 		Style: pterm.NewStyle(pterm.BgGreen, pterm.FgBlack),
@@ -43,6 +87,9 @@ func Info(format string, args ...any) {
 }
 
 func Warning(format string, args ...any) {
+	if isQuieter {
+		return
+	}
 	pterm.Warning.Prefix = pterm.Prefix{
 		Text:  warningPrefixText,
 		Style: pterm.NewStyle(pterm.BgYellow, pterm.FgBlack),
@@ -73,7 +120,7 @@ func Error(format string, args ...any) {
 }
 
 func Execute(msg string) {
-	if !executeEnabled {
+	if isQuiet || !showExecutedCommands {
 		return
 	}
 	pterm.Info.Prefix = pterm.Prefix{
