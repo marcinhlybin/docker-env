@@ -35,8 +35,8 @@ type VersionFlags map[string]func()
 func versionAction(c *cli.Context) error {
 	flags := VersionFlags{
 		"short":       version.PrintVersionString,
-		"build-date":  version.PrintBuildDate,
-		"commit-hash": version.PrintCommitHash,
+		"build-date":  version.PrintBuildDateString,
+		"commit-hash": version.PrintCommitHashString,
 	}
 
 	for flag, function := range flags {

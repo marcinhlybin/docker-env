@@ -22,10 +22,10 @@ func PrintVersionString() {
 	fmt.Println(Version)
 }
 
-func PrintBuildDate() {
+func PrintBuildDateString() {
 	fmt.Println(BuildDate)
 }
 
-func PrintCommitHash() {
+func PrintCommitHashString() {
 	fmt.Println(CommitHash)
 }
