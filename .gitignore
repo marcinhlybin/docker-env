@@ -31,3 +31,5 @@ docker-env
 
 
 .DS_Store
+
+dist/
