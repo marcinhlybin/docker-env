@@ -20,8 +20,6 @@ type DockerCmd struct {
 }
 
 func NewDockerCmd(cfg *config.Config) *DockerCmd {
-	logger.ShowCommands(cfg.ShowCommands)
-
 	return &DockerCmd{
 		Config: cfg,
 		Cmd:    "docker",
@@ -90,12 +88,12 @@ func (dc *DockerCmd) Execute() error {
 	cmd := exec.Command(dc.Cmd, dc.Args...)
 	logger.Execute(cmd.String())
 
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
+	// cmd.Stdin = logger.Stdin()
+	cmd.Stdout = logger.Stdout()
 
 	// Capture stderr output
 	var stderrBuf bytes.Buffer
-	cmd.Stderr = io.MultiWriter(os.Stderr, &stderrBuf)
+	cmd.Stderr = io.MultiWriter(logger.Stderr(), &stderrBuf)
 
 	if err := cmd.Run(); err != nil {
 		// Log the captured stderr output

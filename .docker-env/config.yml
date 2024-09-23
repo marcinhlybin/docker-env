@@ -17,7 +17,7 @@ compose_default_profile: app
 compose_sidecar_profile: sidecar
 
 # Debug options
-show_commands: true
+show_executed_commands: true
 
 # Env files to load environmental variables used in the docker-compose.yml file
 # for substitution in the services section

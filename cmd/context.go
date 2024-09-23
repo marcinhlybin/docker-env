@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/marcinhlybin/docker-env/addons"
 	"github.com/marcinhlybin/docker-env/config"
+	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/marcinhlybin/docker-env/project"
 	"github.com/marcinhlybin/docker-env/registry"
 	"github.com/urfave/cli/v2"
@@ -42,6 +43,10 @@ func initializeConfig(c *cli.Context) (*config.Config, error) {
 	if err := cfg.LoadConfig(c.String("config")); err != nil {
 		return nil, err
 	}
+
+	// Show executed commands
+	logger.ShowExecutedCommands(cfg.ShowExecutedCommands)
+
 	return cfg, nil
 }
 

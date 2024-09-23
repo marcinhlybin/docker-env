@@ -41,6 +41,16 @@ If environment name is not specified current branch name is used.`,
 				Aliases: []string{"d"},
 				Usage:   "enable debug mode",
 			},
+			&cli.BoolFlag{
+				Name:    "quiet",
+				Aliases: []string{"q"},
+				Usage:   "disable info messages",
+			},
+			&cli.BoolFlag{
+				Name:    "quieter",
+				Aliases: []string{"qq"},
+				Usage:   "disable docker output",
+			},
 		},
 		Before: func(c *cli.Context) error {
 			// Show help if no arguments
@@ -49,9 +59,17 @@ If environment name is not specified current branch name is used.`,
 			}
 
 			// Enable debug mode
-			if c.Bool("debug") {
-				logger.SetDebug(true)
-			}
+			showDebug := c.Bool("debug")
+			logger.SetDebug(showDebug)
+
+			// Disable info messages
+			// Docker output is still visible
+			quiet := c.Bool("quiet")
+			logger.SetQuiet(quiet)
+
+			// Disable all output except errors
+			quieter := c.Bool("quieter")
+			logger.SetQuieter(quieter)
 
 			return nil
 		},

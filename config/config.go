@@ -33,7 +33,7 @@ type Config struct {
 	PostStartHook          string   `yaml:"post_start_hook"`
 	PostStopHook           string   `yaml:"post_stop_hook"`
 	RequiredVars           []string `yaml:"required_vars"`
-	ShowCommands           bool     `yaml:"show_commands"`
+	ShowExecutedCommands   bool     `yaml:"show_executed_commands"`
 }
 
 func NewConfig() *Config {
@@ -51,7 +51,7 @@ func NewConfig() *Config {
 		PostStartHook:          "",
 		PostStopHook:           "",
 		RequiredVars:           []string{},
-		ShowCommands:           true,
+		ShowExecutedCommands:   true,
 	}
 }
 
@@ -118,6 +118,6 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("VSCode default service:", c.VscodeDefaultService)
 	fmt.Println("VSCode default directory:", c.VscodeDefaultDir)
 	fmt.Println()
-	fmt.Println("Show commands:", c.ShowCommands)
+	fmt.Println("Show executed commands:", c.ShowExecutedCommands)
 	return nil
 }
