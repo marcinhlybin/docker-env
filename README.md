@@ -234,21 +234,23 @@ Installs into `/usr/local/bin`. Sudo password required.
 
 ## Troubleshooting
 
-### Cannot connecto to the Docker daemon
+### Error running docker command: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
 
-Docker desktop is running but I keep receiving error message
-
-```
- ERROR  Error running docker command: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
-```
-
-**Solution:** Point `DOCKER_HOST` to docker socket in your home directory:
+Set `DOCKER_HOST` to docker socket in your home directory:
 
 ```
 export DOCKER_HOST="unix:///$HOME/.docker/run/docker.sock"
 ```
 
 or in Docker Desktop in Settings -> Advanced select `Allow the default Docker socket to be used (requires password)`
+
+### Error getting AWS registry password: Unable to locate credentials. You can configure credentials by running "aws configure".
+
+Export `AWS_PROFILE` variables matching the profile in `~/.aws/credentials`:
+
+```
+export AWS_PROFILE=default
+```
 
 ### Pre start hooks from pre-start.d directory don't run
 
