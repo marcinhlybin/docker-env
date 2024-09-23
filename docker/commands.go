@@ -87,10 +87,15 @@ func (dc *DockerCmd) FetchProjectContainersCommand(p *project.Project) *DockerCm
 //
 // It is not possible to list all containers using docker compose command
 // because --project-name argument is mandatory
-func (dc *DockerCmd) FetchAllContainersCommand() *DockerCmd {
+func (dc *DockerCmd) FetchAllContainersCommand(includeStopped bool) *DockerCmd {
 	dc.DockerCommand()
-	dc.WithArgs("ps", "-a", "--no-trunc", "--format", "json")
+	dc.WithArgs("ps", "--no-trunc", "--format", "json")
 	dc.WithProjectFilter()
+
+	if includeStopped {
+		dc.WithArgs("-a")
+	}
+
 	return dc
 }
 

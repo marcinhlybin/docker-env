@@ -15,11 +15,7 @@ type DockerComposeProject struct {
 	ConfigFiles string `json:"configFiles"`
 }
 
-func (reg *DockerProjectRegistry) ListProjects(includeStopped, showContainers bool) error {
-	if showContainers {
-		return reg.ListContainers()
-	}
-
+func (reg *DockerProjectRegistry) ListProjects(includeStopped bool) error {
 	projects, err := reg.fetchProjects(includeStopped)
 	if err != nil {
 		return err
