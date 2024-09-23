@@ -8,13 +8,17 @@ import (
 var ListCommand = cli.Command{
 	Name:        "ls",
 	Aliases:     []string{"list", "l", "ll"},
-	Usage:       "List projects. Use 'll' to show containers.",
+	Usage:       "List projects, 'll' to show containers.",
 	Description: `List docker projects and containers.`,
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
-			Name:    "verbose",
-			Aliases: []string{"v"},
+			Name:    "containers",
+			Aliases: []string{"c"},
 			Usage:   "show containers",
+		},
+		&cli.BoolFlag{
+			Name:  "running",
+			Usage: "show only running projects",
 		},
 	},
 	Action: listAction,
@@ -28,9 +32,10 @@ func listAction(c *cli.Context) error {
 		return err
 	}
 
-	verbose := c.Bool("verbose") || isAliasUsed("ll")
-
 	logger.SetPrefix(ctx.Config.ComposeProjectName)
 
-	return ctx.Registry.ListProjects(verbose)
+	showContainers := c.Bool("containers") || isAliasUsed("ll")
+	includeStopped := !c.Bool("running")
+
+	return ctx.Registry.ListProjects(includeStopped, showContainers)
 }

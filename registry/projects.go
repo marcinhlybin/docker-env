@@ -15,23 +15,22 @@ type DockerComposeProject struct {
 	ConfigFiles string `json:"configFiles"`
 }
 
-func (reg *DockerProjectRegistry) ListProjects(verbose bool) error {
-	if verbose {
+func (reg *DockerProjectRegistry) ListProjects(includeStopped, showContainers bool) error {
+	if showContainers {
 		return reg.ListContainers()
 	}
 
-	includeStopped := true
 	projects, err := reg.fetchProjects(includeStopped)
 	if err != nil {
 		return err
 	}
 
 	for _, p := range projects {
-		if p.IsRunning() {
-			fmt.Println(p.Name, "*")
-		} else {
-			fmt.Println(p.Name)
+		runningIndicator := ""
+		if includeStopped && p.IsRunning() {
+			runningIndicator = "*"
 		}
+		fmt.Println(p.Name, runningIndicator)
 	}
 
 	return nil
