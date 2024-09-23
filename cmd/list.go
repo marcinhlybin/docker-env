@@ -17,8 +17,9 @@ var ListCommand = cli.Command{
 			Usage:   "show containers",
 		},
 		&cli.BoolFlag{
-			Name:  "running",
-			Usage: "show only running projects",
+			Name:    "running",
+			Aliases: []string{"r"},
+			Usage:   "show only running projects",
 		},
 	},
 	Action: listAction,
@@ -34,8 +35,12 @@ func listAction(c *cli.Context) error {
 
 	logger.SetPrefix(ctx.Config.ComposeProjectName)
 
-	showContainers := c.Bool("containers") || isAliasUsed("ll")
+	containers := c.Bool("containers") || isAliasUsed("ll")
 	includeStopped := !c.Bool("running")
 
-	return ctx.Registry.ListProjects(includeStopped, showContainers)
+	if containers {
+		return ctx.Registry.ListContainers(includeStopped)
+	}
+
+	return ctx.Registry.ListProjects(includeStopped)
 }

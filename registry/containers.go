@@ -37,8 +37,8 @@ func (reg *DockerProjectRegistry) ServiceContainer(p *project.Project) (*docker.
 	return nil, nil
 }
 
-func (reg *DockerProjectRegistry) ListContainers() error {
-	containers, err := reg.fetchContainers()
+func (reg *DockerProjectRegistry) ListContainers(includeStopped bool) error {
+	containers, err := reg.fetchContainers(includeStopped)
 	if err != nil {
 		return err
 	}
@@ -74,9 +74,9 @@ func (reg *DockerProjectRegistry) ListContainers() error {
 	return nil
 }
 
-func (reg *DockerProjectRegistry) fetchContainers() ([]docker.Container, error) {
-	logger.Debug("Fetching all containers")
-	dc := reg.dockerCmd.FetchAllContainersCommand()
+func (reg *DockerProjectRegistry) fetchContainers(includeStopped bool) ([]docker.Container, error) {
+	logger.Debug("Fetching containers, includeStopped: %s", includeStopped)
+	dc := reg.dockerCmd.FetchAllContainersCommand(includeStopped)
 	jsonRecords, err := dc.ExecuteWithOutput()
 	if err != nil {
 		return nil, err
