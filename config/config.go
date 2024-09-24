@@ -19,6 +19,7 @@ type Config struct {
 	ComposeProjectName     string   `yaml:"compose_project_name"`
 	ComposeFile            string   `yaml:"compose_file"`
 	ComposeFileOverride    string   `yaml:"compose_file_override"`
+	ComposeProgress        string   `yaml:"compose_progress"`
 	ComposeDefaultProfile  string   `yaml:"compose_default_profile"`
 	ComposeSidecarProfile  string   `yaml:"compose_sidecar_profile"`
 	EnvFiles               []string `yaml:"env_files"`
@@ -40,6 +41,7 @@ func NewConfig() *Config {
 	return &Config{
 		ComposeFile:            "docker-compose.yml",
 		ComposeFileOverride:    "docker-compose.override.yml",
+		ComposeProgress:        "tty",
 		ComposeDefaultProfile:  "app",
 		ComposeSidecarProfile:  "sidecar",
 		EnvFiles:               []string{},
@@ -99,6 +101,8 @@ func readConfigFile(path string, cfg *Config) error {
 func (c *Config) ShowConfig() error {
 	fmt.Println("Compose project name:", c.ComposeProjectName)
 	fmt.Println("Compose file:", c.ComposeFile)
+	fmt.Println("Compose file override:", c.ComposeFileOverride)
+	fmt.Println("Compose progress:", c.ComposeProgress)
 	fmt.Println("Compose default profile:", c.ComposeDefaultProfile)
 	fmt.Println("Compose sidecar profile:", c.ComposeSidecarProfile)
 	fmt.Println()

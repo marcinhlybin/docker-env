@@ -39,7 +39,7 @@ func (dc *DockerCmd) DockerComposeCommand() *DockerCmd {
 		"compose",
 		"--file", dc.Config.ComposeFile,
 		"--profile", dc.Config.ComposeDefaultProfile,
-		"--progress", "tty"}
+		"--progress", dc.Config.ComposeProgress}
 
 	// Add the override file if it exists
 	if _, err := os.Stat(dc.Config.ComposeFileOverride); err == nil {

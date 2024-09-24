@@ -32,17 +32,14 @@ func TestDockerCommand(t *testing.T) {
 }
 
 func TestDockerComposeCommand(t *testing.T) {
-	cfg := &config.Config{
-		ComposeFile:           "docker-compose.yml",
-		ComposeDefaultProfile: "dev",
-		EnvFiles:              []string{"env1", "env2"},
-	}
+	cfg := config.NewConfig()
+	cfg.EnvFiles = []string{"env1", "env2"}
 	dc := docker.NewDockerCmd(cfg).DockerComposeCommand()
 
 	expectedArgs := []string{
 		"compose",
 		"--file", "docker-compose.yml",
-		"--profile", "dev",
+		"--profile", "app",
 		"--progress", "tty",
 		"--env-file", "env1",
 		"--env-file", "env2",
