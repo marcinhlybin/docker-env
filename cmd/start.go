@@ -33,6 +33,11 @@ If project does not exist it will be created.`,
 			Aliases: []string{"u"},
 			Usage:   "update the images and recreate the containers",
 		},
+		&cli.BoolFlag{
+			Name:    "no-hooks",
+			Aliases: []string{"without-hooks"},
+			Usage:   "do not run pre/post start hooks",
+		},
 	},
 	Action: startAction,
 }
@@ -54,13 +59,25 @@ func startAction(c *cli.Context) error {
 		return err
 	}
 
-	if err := ctx.RunPreStartHook(); err != nil {
-		return err
+	// Pre-start hooks
+	withHooks := !c.Bool("no-hooks")
+	if withHooks {
+		if err := ctx.RunPreStartHook(); err != nil {
+			return err
+		}
 	}
 
+	// Start the project
 	if err := ctx.Registry.StartProject(ctx.Project, recreate, update); err != nil {
 		return err
 	}
 
-	return ctx.RunPostStartHook()
+	// Post-start hooks
+	if withHooks {
+		if err := ctx.RunPostStartHook(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
