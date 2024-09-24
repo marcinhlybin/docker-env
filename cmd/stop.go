@@ -22,6 +22,11 @@ If environment name is not specified current branch name is used.`,
 			Aliases: []string{"s"},
 			Usage:   "stop a single service",
 		},
+		&cli.BoolFlag{
+			Name:    "no-hooks",
+			Aliases: []string{"without-hooks"},
+			Usage:   "do not run pre/post start hooks",
+		},
 	},
 	Action: stopAction,
 }
@@ -35,10 +40,18 @@ func stopAction(c *cli.Context) error {
 	}
 	logger.SetPrefix(ctx.Project.Name)
 
+	// Stop the project
 	if err := ctx.Registry.StopProject(ctx.Project); err != nil {
 		return err
 	}
 
-	return ctx.RunPostStopHook()
+	// Post-stop hooks
+	withHooks := !c.Bool("no-hooks")
+	if withHooks {
+		if err := ctx.RunPostStopHook(); err != nil {
+			return err
+		}
+	}
 
+	return nil
 }
