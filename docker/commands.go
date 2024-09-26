@@ -102,6 +102,7 @@ func (dc *DockerCmd) FetchAllContainersCommand(includeStopped bool) *DockerCmd {
 func (dc *DockerCmd) BuildProjectCommand(p *project.Project, noCache bool) *DockerCmd {
 	dc.DockerComposeCommand()
 	dc.WithProjectName(p)
+	dc.WithSidecarProfile()
 	dc.WithArgs("build")
 
 	if noCache {
