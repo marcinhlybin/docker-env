@@ -12,7 +12,7 @@ build: clean
 	@go build -ldflags "-X '$(PKG)/version.BuildDate=$(BUILD_DATE)' -X '$(PKG)/version.CommitHash=$(COMMIT_HASH)'" -o $(OUTPUT)
 
 install: build
-	sudo install -m 0755 $(OUTPUT) /usr/local/bin
+	sudo -p "Enter password to install docker-env: " install -m 0755 $(OUTPUT) /usr/local/bin
 
 uninstall:
 	sudo rm -f /usr/local/bin/$(OUTPUT)
