@@ -88,7 +88,7 @@ func (dc *DockerCmd) Execute() error {
 	cmd := exec.Command(dc.Cmd, dc.Args...)
 	logger.Execute(cmd.String())
 
-	// cmd.Stdin = logger.Stdin()
+	cmd.Stdin = logger.Stdin()
 	cmd.Stdout = logger.Stdout()
 
 	// Capture stderr output
