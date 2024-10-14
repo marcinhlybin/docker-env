@@ -16,7 +16,6 @@ PASSWORD_PROMPT="Enter password: "
 CERT_FILE="$CERTS_DIR/$CERT_NAME.crt"
 KEY_FILE="$CERTS_DIR/$CERT_NAME.key"
 
-pwd
 function is_linux {
   [ "$(uname)" == "Linux" ]
 }
