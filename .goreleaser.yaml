@@ -38,7 +38,7 @@ brews:
       bin.install "docker-env"
     repository:
       owner: marcinhlybin
-      name: homebrew-docker-env
+      name: homebrew-tap
       branch: master
 
 changelog:
