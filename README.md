@@ -25,7 +25,7 @@ In short, docker-env abstracts common docker-compose tasks, allowing you to focu
 On MacOS use Homebrew to install:
 
 ```
-brew install marcinhlybin/docker-env/docker-env
+brew install marcinhlybin/tap/docker-env
 ```
 
 On Linux see building or download binary from releases.
