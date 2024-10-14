@@ -18,6 +18,24 @@ builds:
     goos:
       - linux
       - darwin
+    goarch:
+      - amd64
+      - arm64
+
+brews:
+  - name: docker-env
+    homepage: https://github.com/marcinhlybin/docker-env
+    description: Per branch docker compose environment manager
+    license: MIT
+    skip_upload: true
+    test: |
+      assert_match "#{version}", shell_output("#{bin}/docker-env --version")
+    install: |
+      bin.install "docker-env"
+    # repository:
+    #   owner: marcinhlybin
+    #   name: homebrew-docker-env
+    #   branch: master
 
 changelog:
   sort: asc
