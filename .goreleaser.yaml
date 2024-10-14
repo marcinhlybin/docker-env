@@ -31,15 +31,15 @@ brews:
     homepage: https://github.com/marcinhlybin/docker-env
     description: Per branch docker compose environment manager
     license: MIT
-    skip_upload: true
+    skip_upload: false
     test: |
       assert_match "#{version}", shell_output("#{bin}/docker-env --version")
     install: |
       bin.install "docker-env"
-    # repository:
-    #   owner: marcinhlybin
-    #   name: homebrew-docker-env
-    #   branch: master
+    repository:
+      owner: marcinhlybin
+      name: homebrew-docker-env
+      branch: master
 
 changelog:
   sort: asc
