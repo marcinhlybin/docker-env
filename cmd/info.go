@@ -15,10 +15,12 @@ var InfoCommand = cli.Command{
 func infoAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	ctx, err := NewAppContext(c)
+	app, err := NewApp(c)
 	if err != nil {
 		return err
 	}
 
-	return ctx.Config.ShowConfig()
+	cfg := app.Config
+
+	return cfg.ShowConfig()
 }

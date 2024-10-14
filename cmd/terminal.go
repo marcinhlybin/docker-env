@@ -27,14 +27,15 @@ var TerminalCommand = cli.Command{
 }
 
 func terminalAction(c *cli.Context) error {
-	ctx, err := NewAppContext(c)
+	app, err := NewApp(c)
 	if err != nil {
 		return err
 	}
 
-	logger.SetPrefix(ctx.Project.Name)
+	p, reg := app.Project, app.Registry
+	logger.SetPrefix(p.Name)
 
 	cmd := c.Args().Slice()
 
-	return ctx.Registry.Terminal(ctx.Project, cmd)
+	return reg.Terminal(p, cmd)
 }

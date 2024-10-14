@@ -9,13 +9,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type AppContext struct {
+type App struct {
 	Config   *config.Config
 	Project  *project.Project
 	Registry *registry.DockerProjectRegistry
 }
 
-func NewAppContext(c *cli.Context) (*AppContext, error) {
+func NewApp(c *cli.Context) (*App, error) {
 	cfg, err := initializeConfig(c)
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func NewAppContext(c *cli.Context) (*AppContext, error) {
 		return nil, err
 	}
 
-	return &AppContext{
+	return &App{
 		Config:   cfg,
 		Project:  p,
 		Registry: reg,
@@ -62,17 +62,23 @@ func initializeRegistry(cfg *config.Config) (*registry.DockerProjectRegistry, er
 	return registry.NewDockerProjectRegistry(cfg), nil
 }
 
-func (ctx *AppContext) RunPreStartHook() error {
-	hook := addons.NewPreStartHook(ctx.Config.PreStartHook, ctx.Project.Name, ctx.Project.ServiceName)
+func (app *App) RunPreStartHook() error {
+	p, cfg := app.Project, app.Config
+	path := cfg.PreStartHook
+	hook := addons.NewPreStartHook(path, p.Name, p.ServiceName)
 	return hook.Run()
 }
 
-func (ctx *AppContext) RunPostStartHook() error {
-	hook := addons.NewPostStartHook(ctx.Config.PostStartHook, ctx.Project.Name, ctx.Project.ServiceName)
+func (app *App) RunPostStartHook() error {
+	p, cfg := app.Project, app.Config
+	path := cfg.PostStartHook
+	hook := addons.NewPostStartHook(path, p.Name, p.ServiceName)
 	return hook.Run()
 }
 
-func (ctx *AppContext) RunPostStopHook() error {
-	hook := addons.NewPostStopHook(ctx.Config.PostStopHook, ctx.Project.Name, ctx.Project.ServiceName)
+func (app *App) RunPostStopHook() error {
+	p, cfg := app.Project, app.Config
+	path := cfg.PostStopHook
+	hook := addons.NewPostStopHook(path, p.Name, p.ServiceName)
 	return hook.Run()
 }

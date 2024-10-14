@@ -28,19 +28,20 @@ var ListCommand = cli.Command{
 func listAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	ctx, err := NewAppContext(c)
+	app, err := NewApp(c)
 	if err != nil {
 		return err
 	}
 
-	logger.SetPrefix(ctx.Config.ComposeProjectName)
+	reg, cfg := app.Registry, app.Config
+	logger.SetPrefix(cfg.ComposeProjectName)
 
 	containers := c.Bool("containers") || isAliasUsed("ll")
 	includeStopped := !c.Bool("running")
 
 	if containers {
-		return ctx.Registry.ListContainers(includeStopped)
+		return reg.ListContainers(includeStopped)
 	}
 
-	return ctx.Registry.ListProjects(includeStopped)
+	return reg.ListProjects(includeStopped)
 }

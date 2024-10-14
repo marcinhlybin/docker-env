@@ -45,36 +45,39 @@ If project does not exist it will be created.`,
 func startAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	ctx, err := NewAppContext(c)
+	app, err := NewApp(c)
 	if err != nil {
 		return err
 	}
 
+	p, reg := app.Project, app.Registry
+	reg.UpdateProjectStatus(p)
+
 	recreate := c.Bool("recreate")
 	update := c.Bool("update")
 
-	logger.SetPrefix(ctx.Project.Name)
+	logger.SetPrefix(p.Name)
 
-	if err := ctx.Registry.StopOtherActiveProjects(ctx.Project); err != nil {
+	if err := reg.StopOtherActiveProjects(p); err != nil {
 		return err
 	}
 
 	// Pre-start hooks
 	withHooks := !c.Bool("no-hooks")
-	if withHooks {
-		if err := ctx.RunPreStartHook(); err != nil {
+	if withHooks && !p.IsRunning() {
+		if err := app.RunPreStartHook(); err != nil {
 			return err
 		}
 	}
 
 	// Start the project
-	if err := ctx.Registry.StartProject(ctx.Project, recreate, update); err != nil {
+	if err := reg.StartProject(p, recreate, update); err != nil {
 		return err
 	}
 
 	// Post-start hooks
-	if withHooks {
-		if err := ctx.RunPostStartHook(); err != nil {
+	if withHooks && !p.IsRunning() {
+		if err := app.RunPostStartHook(); err != nil {
 			return err
 		}
 	}

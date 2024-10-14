@@ -61,7 +61,7 @@ func (reg *DockerProjectRegistry) createProjectsFromJson(jsonString string) ([]*
 			logger.Warning("Skipping %s due to error: %v", name, err)
 			continue
 		}
-		p.Status = dcProject.Status
+		p.SetStatus(dcProject.Status)
 		projects = append(projects, p)
 	}
 

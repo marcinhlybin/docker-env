@@ -25,6 +25,22 @@ func NewDockerProjectRegistry(cfg *config.Config) *DockerProjectRegistry {
 	}
 }
 
+func (reg *DockerProjectRegistry) UpdateProjectStatus(p *project.Project) error {
+	projects, err := reg.fetchProjects(true)
+	if err != nil {
+		return err
+	}
+
+	for _, proj := range projects {
+		if proj.Name == p.Name {
+			p.SetStatus(proj.Status)
+			return nil
+		}
+	}
+
+	return nil
+}
+
 func (reg *DockerProjectRegistry) ProjectExists(p *project.Project) (bool, error) {
 	includeStopped := true
 	projects, err := reg.fetchProjects(includeStopped)

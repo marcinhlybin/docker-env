@@ -34,21 +34,23 @@ If environment name is not specified current branch name is used.`,
 func stopAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	ctx, err := NewAppContext(c)
+	app, err := NewApp(c)
 	if err != nil {
 		return err
 	}
-	logger.SetPrefix(ctx.Project.Name)
+
+	p, reg := app.Project, app.Registry
+	logger.SetPrefix(p.Name)
 
 	// Stop the project
-	if err := ctx.Registry.StopProject(ctx.Project); err != nil {
+	if err := reg.StopProject(p); err != nil {
 		return err
 	}
 
 	// Post-stop hooks
 	withHooks := !c.Bool("no-hooks")
 	if withHooks {
-		if err := ctx.RunPostStopHook(); err != nil {
+		if err := app.RunPostStopHook(); err != nil {
 			return err
 		}
 	}

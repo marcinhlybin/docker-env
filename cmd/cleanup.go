@@ -22,14 +22,15 @@ var CleanupCommand = cli.Command{
 func cleanupAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	ctx, err := NewAppContext(c)
+	app, err := NewApp(c)
 	if err != nil {
 		return err
 	}
 
-	logger.SetPrefix(ctx.Config.ComposeProjectName)
+	reg, cfg := app.Registry, app.Config
+	logger.SetPrefix(cfg.ComposeProjectName)
 
 	includeImages := c.Bool("with-images")
 
-	return ctx.Registry.Cleanup(includeImages)
+	return reg.Cleanup(includeImages)
 }
