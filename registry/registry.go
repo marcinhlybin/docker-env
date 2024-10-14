@@ -201,3 +201,9 @@ func (reg *DockerProjectRegistry) Code(p *project.Project, dir string) error {
 
 	return reg.dockerCmd.OpenCode(container, dir)
 }
+
+func (reg *DockerProjectRegistry) Logs(p *project.Project, opts docker.LogsOptions) error {
+	logger.Info("Showing logs for %s", p.String())
+	dc := reg.dockerCmd.LogsCommand(p, opts)
+	return dc.Execute()
+}

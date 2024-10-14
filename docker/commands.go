@@ -138,3 +138,28 @@ func (dc *DockerCmd) RemoveImageCommand(id string) *DockerCmd {
 	dc.WithArgs("rmi", id)
 	return dc
 }
+
+type LogsOptions struct {
+	FollowOutput   bool
+	ShowTimestamps bool
+}
+
+func (dc *DockerCmd) LogsCommand(p *project.Project, opts LogsOptions) *DockerCmd {
+	dc.DockerComposeCommand()
+	dc.WithProjectName(p)
+	dc.WithArgs("logs")
+
+	if p.IsServiceDefined() {
+		dc.WithArgs(p.ServiceName)
+	}
+
+	if opts.FollowOutput {
+		dc.WithArgs("--follow")
+	}
+
+	if opts.ShowTimestamps {
+		dc.WithArgs("--timestamps")
+	}
+
+	return dc
+}

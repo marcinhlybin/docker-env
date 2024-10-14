@@ -29,6 +29,7 @@ If environment name is not specified current branch name is used.`,
 			&cmd.TerminalCommand,
 			&cmd.CodeCommand,
 			&cmd.VersionCommand,
+			&cmd.LogsCommand,
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
