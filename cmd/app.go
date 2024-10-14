@@ -62,23 +62,35 @@ func initializeRegistry(cfg *config.Config) (*registry.DockerProjectRegistry, er
 	return registry.NewDockerProjectRegistry(cfg), nil
 }
 
-func (app *App) RunPreStartHook() error {
+func (app *App) RunPreStartHooks() error {
 	p, cfg := app.Project, app.Config
-	path := cfg.PreStartHook
-	hook := addons.NewPreStartHook(path, p.Name, p.ServiceName)
-	return hook.Run()
+	for _, path := range cfg.PreStartHooks {
+		hook := addons.NewPreStartHook(path, p.Name, p.ServiceName)
+		if err := hook.Run(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (app *App) RunPostStartHook() error {
+func (app *App) RunPostStartHooks() error {
 	p, cfg := app.Project, app.Config
-	path := cfg.PostStartHook
-	hook := addons.NewPostStartHook(path, p.Name, p.ServiceName)
-	return hook.Run()
+	for _, path := range cfg.PostStartHooks {
+		hook := addons.NewPostStartHook(path, p.Name, p.ServiceName)
+		if err := hook.Run(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (app *App) RunPostStopHook() error {
+func (app *App) RunPostStopHooks() error {
 	p, cfg := app.Project, app.Config
-	path := cfg.PostStopHook
-	hook := addons.NewPostStopHook(path, p.Name, p.ServiceName)
-	return hook.Run()
+	for _, path := range cfg.PostStopHooks {
+		hook := addons.NewPostStopHook(path, p.Name, p.ServiceName)
+		if err := hook.Run(); err != nil {
+			return err
+		}
+	}
+	return nil
 }

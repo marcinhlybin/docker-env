@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -30,9 +29,9 @@ type Config struct {
 	AwsLogin               bool     `yaml:"aws_login"`
 	AwsRegion              string   `yaml:"aws_region"`
 	AwsRepository          string   `yaml:"aws_repository"`
-	PreStartHook           string   `yaml:"pre_start_hook"`
-	PostStartHook          string   `yaml:"post_start_hook"`
-	PostStopHook           string   `yaml:"post_stop_hook"`
+	PreStartHooks          []string `yaml:"pre_start_hooks"`
+	PostStartHooks         []string `yaml:"post_start_hooks"`
+	PostStopHooks          []string `yaml:"post_stop_hooks"`
 	RequiredVars           []string `yaml:"required_vars"`
 	ShowExecutedCommands   bool     `yaml:"show_executed_commands"`
 }
@@ -49,9 +48,9 @@ func NewConfig() *Config {
 		TerminalDefaultCommand: "/bin/bash",
 		VscodeDefaultService:   "app",
 		VscodeDefaultDir:       "/",
-		PreStartHook:           "",
-		PostStartHook:          "",
-		PostStopHook:           "",
+		PreStartHooks:          []string{},
+		PostStartHooks:         []string{},
+		PostStopHooks:          []string{},
 		RequiredVars:           []string{},
 		ShowExecutedCommands:   true,
 	}
@@ -106,12 +105,15 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("Compose default profile:", c.ComposeDefaultProfile)
 	fmt.Println("Compose sidecar profile:", c.ComposeSidecarProfile)
 	fmt.Println()
-	fmt.Println("Env files:", strings.Join(c.EnvFiles, ", "))
-	fmt.Println("Required vars:", strings.Join(c.RequiredVars, ", "))
+	printList("Env files:", c.EnvFiles)
 	fmt.Println()
-	fmt.Println("Pre-start hook:", c.PreStartHook)
-	fmt.Println("Post-start hook:", c.PostStartHook)
-	fmt.Println("Post-stop hook:", c.PostStopHook)
+	printList("Required vars:", c.RequiredVars)
+	fmt.Println()
+	printList("Pre-start hooks:", c.PreStartHooks)
+	fmt.Println()
+	printList("Post-start hooks:", c.PostStartHooks)
+	fmt.Println()
+	printList("Post-stop hooks:", c.PostStopHooks)
 	fmt.Println()
 	fmt.Println("AWS login:", c.AwsLogin)
 	fmt.Println("AWS region:", c.AwsRegion)
@@ -124,4 +126,11 @@ func (c *Config) ShowConfig() error {
 	fmt.Println()
 	fmt.Println("Show executed commands:", c.ShowExecutedCommands)
 	return nil
+}
+
+func printList(title string, items []string) {
+	fmt.Println(title)
+	for _, item := range items {
+		fmt.Println("  -", item)
+	}
 }

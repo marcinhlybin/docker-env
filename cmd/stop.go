@@ -50,7 +50,7 @@ func stopAction(c *cli.Context) error {
 	// Post-stop hooks
 	withHooks := !c.Bool("no-hooks")
 	if withHooks {
-		if err := app.RunPostStopHook(); err != nil {
+		if err := app.RunPostStopHooks(); err != nil {
 			return err
 		}
 	}

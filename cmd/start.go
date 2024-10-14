@@ -65,7 +65,7 @@ func startAction(c *cli.Context) error {
 	// Pre-start hooks
 	withHooks := !c.Bool("no-hooks")
 	if withHooks && !p.IsRunning() {
-		if err := app.RunPreStartHook(); err != nil {
+		if err := app.RunPreStartHooks(); err != nil {
 			return err
 		}
 	}
@@ -77,7 +77,7 @@ func startAction(c *cli.Context) error {
 
 	// Post-start hooks
 	if withHooks && !p.IsRunning() {
-		if err := app.RunPostStartHook(); err != nil {
+		if err := app.RunPostStartHooks(); err != nil {
 			return err
 		}
 	}

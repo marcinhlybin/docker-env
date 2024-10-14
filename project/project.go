@@ -76,9 +76,6 @@ func (p *Project) IsServiceDefined() bool {
 }
 
 func (p *Project) IsRunning() bool {
-	if p.Status == "" {
-		panic("Internal error: Checking if project is running without status set")
-	}
 	return strings.Contains(p.Status, "running")
 }
 
