@@ -44,10 +44,13 @@ vscode_default_dir: /app
 
 # Scripts to run before and after
 pre_start_hooks: 
-  - .docker-env/pre-start.sh
+  - .docker-env/pre-start.d/10-add-ssl-certificate-linux.sh
+  - .docker-env/pre-start.d/10-add-ssl-certificate-macos.sh
+  - .docker-env/pre-start.d/20-ports.sh
+  - .docker-env/pre-start.d/30-ssh-agent.sh
 
 post_start_hooks: 
-  - .docker-env/post-start.sh
+  - .docker-env/post-start.d/10-show-message.sh
 
 post_stop_hooks: 
-  - .docker-env/post-stop.sh
+  - .docker-env/post-stop.d/10-node-modules.sh

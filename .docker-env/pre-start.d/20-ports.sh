@@ -24,9 +24,14 @@ function port_used_by {
 
 for PORT in $PORTS; do
     if port_is_open $PORT; then
+        ERR=1
         comm=$(port_used_by $PORT)
-        echo "WARNING! Port $PORT is already in use by $comm" >&2
+        echo "Port $PORT is already in use by $comm" >&2
     fi
 done
+
+if [ "$ERR" ]; then
+    exit 1
+fi
 
 exit 0

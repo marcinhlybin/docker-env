@@ -18,7 +18,29 @@ In short, docker-env abstracts common docker-compose tasks, allowing you to focu
 * Repository isolation: Prefix project by repository name, ensuring no conflicts between different repositories.
 * Sidecar containers: Optional services, like admin tools or background jobs, can be started as needed without starting by default.
 * Hooks: Customize pre-start, post-start, and post-stop behaviors with hooks.
-* Multi-environment support: Easily manage multiple Docker Compose environments across projects.
+
+
+## Installing
+
+On MacOS use Homebrew to install:
+
+```
+brew install marcinhlybin/docker-env/docker-env
+```
+
+On Linux see building or download binary from releases.
+
+## Building
+
+Run `make` to build a binary to the current directory.
+
+```
+brew install go
+make test
+make install
+```
+
+Installs into `/usr/local/bin`. Sudo password required.
 
 ## Usage
 
@@ -30,30 +52,34 @@ USAGE:
    docker-env [global options] command [command options]
 
 VERSION:
-   1.0
+   1.0.0
 
 DESCRIPTION:
-   All commands must run in the git repository directory.
-   If project name is not specified current branch name is used.
+   All commands must run in the git repository directory of the project.
+   If environment name is not specified current branch name is used.
 
 COMMANDS:
    start, s, up                Start docker containers
    stop, ss, down              Stop docker containers
    restart, r, reboot          Restart docker containers
    remove, rm, delete          Remove docker containers
-   ls, list, l, ll             List projects. Use 'll' to show containers.
-   cleanup                     Cleanup entire project
+   ls, list, l, ll             List projects, 'll' to show containers.
+   cleanup                     Removes all projects
    build, b                    Build docker images
    info, config, show          Show configuration
    terminal, term, shell, ssh  Run terminal
    code, open                  Open code editor
+   version, v                  Show version
+   logs, log                   Show container logs
    help, h                     Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --config value, -c value  config file path
    --debug, -d               enable debug mode (default: false)
+   --quiet, -q               disable info messages (default: false)
+   --quieter, --qq           disable docker output (default: false)
    --help, -h                show help
-   --version, -v             print the version
+   --version, -v             show version string, alias for 'version --short' (default: false)
 ```
 
 Start command usage:
@@ -113,6 +139,9 @@ docker-env shell
 
 # Run command in a container
 docker-env shell -s postgresql createdb -U postgres mydb
+
+# Show container logs with follow option
+docker-env logs -s nginx -f
 ```
 
 ## Docker compose
@@ -175,7 +204,7 @@ compose_default_profile: app
 compose_sidecar_profile: sidecar
 
 # Debug options
-show_commands: true
+show_executed_commands: true
 
 # Env files to load environmental variables used in the docker-compose.yml file
 # for substitution in the services section
@@ -190,7 +219,7 @@ required_vars:
   - AWS_SECRET_ACCESS_KEY
 
 # AWS registry
-aws_login: true
+aws_login: false
 aws_region: eu-central-1
 aws_repository: 1234567890.dkr.ecr.eu-central-1.amazonaws.com
 
@@ -201,9 +230,15 @@ vscode_default_service: app
 vscode_default_dir: /app
 
 # Scripts to run before and after
-pre_start_script: .docker-env/pre-start.sh
-post_start_script: .docker-env/post-start.sh
-post_stop_script: .docker-env/post-stop.sh
+pre_start_hooks: 
+  - .docker-env/pre-start.sh
+
+post_start_hooks: 
+  - .docker-env/post-start.sh
+
+post_stop_hooks: 
+  - .docker-env/post-stop.sh
+
 ```
 
 ## Hooks
@@ -215,22 +250,17 @@ Supported hooks are:
 
 Arguments passed to the hooks are `PROJECT_NAME` and `SERVICE_NAME` as positional arguments.
 
-Sample hooks can be found in `.docker-env/` directory:
-* Generate SSL certificates: [.docker-env/pre-start.d/10-ssl-certs](https://github.com/marcinhlybin/docker-env/blob/master/.docker-env/pre-start.d/10-ssl-certs.sh)
-* Run ssh-agent: [.docker-env/pre-start.d/30-ssh-agent.sh](https://github.com/marcinhlybin/docker-env/blob/master/.docker-env/pre-start.d/30-ssh-agent.sh)
-* ...and other
-
-## Building
-
-Run `make` to build a binary to the current directory.
-
 ```
-brew install go
-make test
-make install
+# In bash script use:
+PROJECT_NAME="$1"
+SERVICE_NAME="$2"
 ```
 
-Installs into `/usr/local/bin`. Sudo password required.
+Sample hooks can be found in `.docker-env/` directory to:
+* Generate SSL certificates
+* Run ssh-agent
+* Check ports availability
+
 
 ## Troubleshooting
 
@@ -252,18 +282,9 @@ Export `AWS_PROFILE` variables matching the profile in `~/.aws/credentials`:
 export AWS_PROFILE=default
 ```
 
-### Pre start hooks from pre-start.d directory don't run
-
-If you use this `pre-start.sh` hook:
+## Release
 
 ```
-# Run pre-start scripts
-for f in .docker-env/pre-start.d/*; do
-  if [ -x "$f" ]; then
-    echo "(pre-start) Running $f with args $@"
-    "$f" "$@"
-  fi
-done
+git tag -a v1.0.0 -m "First release"
+goreleaser release --clean
 ```
-
-it looks for scripts in `pre-start.d` directory and checks for executable flag. Set proper permissions with `chmod 755 .docker-env/pre-start.d/*.sh`.
