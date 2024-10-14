@@ -22,6 +22,10 @@ builds:
       - amd64
       - arm64
 
+archives:
+  - format: tar.gz
+    files: []
+
 brews:
   - name: docker-env
     homepage: https://github.com/marcinhlybin/docker-env
