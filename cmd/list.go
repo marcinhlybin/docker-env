@@ -35,6 +35,7 @@ func listAction(c *cli.Context) error {
 
 	reg, cfg := app.Registry, app.Config
 	logger.SetPrefix(cfg.ComposeProjectName)
+	logger.ShowExecutedCommands(false)
 
 	containers := c.Bool("containers") || isAliasUsed("ll")
 	includeStopped := !c.Bool("running")
