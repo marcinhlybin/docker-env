@@ -63,6 +63,7 @@ func initializeRegistry(cfg *config.Config) (*registry.DockerProjectRegistry, er
 }
 
 func (app *App) RunPreStartHooks() error {
+	logger.Info("Running pre-start hooks")
 	p, cfg := app.Project, app.Config
 	for _, path := range cfg.PreStartHooks {
 		hook := addons.NewPreStartHook(path, p.Name, p.ServiceName)
@@ -74,6 +75,7 @@ func (app *App) RunPreStartHooks() error {
 }
 
 func (app *App) RunPostStartHooks() error {
+	logger.Info("Running post-start hooks")
 	p, cfg := app.Project, app.Config
 	for _, path := range cfg.PostStartHooks {
 		hook := addons.NewPostStartHook(path, p.Name, p.ServiceName)
@@ -85,6 +87,7 @@ func (app *App) RunPostStartHooks() error {
 }
 
 func (app *App) RunPostStopHooks() error {
+	logger.Info("Running post-stop hooks")
 	p, cfg := app.Project, app.Config
 	for _, path := range cfg.PostStopHooks {
 		hook := addons.NewPostStopHook(path, p.Name, p.ServiceName)

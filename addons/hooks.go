@@ -45,7 +45,7 @@ func (s *Hook) Run() error {
 		return fmt.Errorf("cannot open %s hook '%s': %w", s.Name, s.Path, err)
 	}
 
-	logger.Info("Running %s hook %s", s.Name, s.Path)
+	logger.Debug("Executing %s hook %s", s.Name, s.Path)
 	return s.executeCommand()
 }
 
