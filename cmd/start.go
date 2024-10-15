@@ -51,12 +51,11 @@ func startAction(c *cli.Context) error {
 	}
 
 	p, reg := app.Project, app.Registry
+	logger.SetPrefix(p.Name)
 	reg.UpdateProjectStatus(p)
 
 	recreate := c.Bool("recreate")
 	update := c.Bool("update")
-
-	logger.SetPrefix(p.Name)
 
 	if err := reg.StopOtherActiveProjects(p); err != nil {
 		return err
