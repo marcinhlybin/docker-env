@@ -284,7 +284,14 @@ export AWS_PROFILE=default
 
 ## Release
 
+1. Change version in `version/version.go`
+2. Create a tag
+3. Run goreleaser
+
 ```
+vim version/version.go
+git commit -m 'First release'
+git push origin master
 git tag -a v1.0.0 -m "First release"
 goreleaser release --clean
 ```

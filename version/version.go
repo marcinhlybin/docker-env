@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-const Version = "1.0.0"
+const Version = "1.0.2"
 
 // Set at build time
 var (
