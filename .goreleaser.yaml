@@ -13,8 +13,8 @@ before:
     - go mod tidy
 
 builds:
-  - env:
-      - CGO_ENABLED=0
+  - hooks:
+      pre: make build
     goos:
       - linux
       - darwin
