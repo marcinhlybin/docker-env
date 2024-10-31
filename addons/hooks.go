@@ -3,23 +3,27 @@ package addons
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"sync"
 
 	"github.com/marcinhlybin/docker-env/logger"
 )
 
 type Hook struct {
-	Name string
-	Path string
-	Args []string
+	Name         string
+	Path         string
+	Args         []string
+	StdoutPrefix string
 }
 
 func NewHook(name string, path string, args ...string) *Hook {
 	return &Hook{
-		Name: name,
-		Path: path,
-		Args: args,
+		Name:         name,
+		Path:         path,
+		Args:         args,
+		StdoutPrefix: "  ",
 	}
 }
 
@@ -35,22 +39,22 @@ func NewPostStopHook(path string, args ...string) *Hook {
 	return NewHook("post-stop", path, args...)
 }
 
-func (s *Hook) Run() error {
-	if s.Path == "" {
+func (h *Hook) Run() error {
+	if h.Path == "" {
 		return nil
 	}
 
 	// Check if hook exists
-	if _, err := os.Stat(s.Path); err != nil {
-		return fmt.Errorf("cannot open %s hook '%s': %w", s.Name, s.Path, err)
+	if _, err := os.Stat(h.Path); err != nil {
+		return fmt.Errorf("cannot open %s hook '%s': %w", h.Name, h.Path, err)
 	}
 
-	logger.Debug("Executing %s hook %s", s.Name, s.Path)
-	return s.executeCommand()
+	logger.Debug("Executing %s hook %s", h.Name, h.Path)
+	return h.executeCommand()
 }
 
-func (s *Hook) executeCommand() error {
-	cmd := exec.Command(s.Path, s.Args...)
+func (h *Hook) executeCommand() error {
+	cmd := exec.Command(h.Path, h.Args...)
 
 	// Get the output pipe
 	stdout, err := cmd.StdoutPipe()
@@ -68,28 +72,45 @@ func (s *Hook) executeCommand() error {
 		return fmt.Errorf("failed to execute command: %w", err)
 	}
 
-	// Create a scanner to read the output line by line
-	scanner := bufio.NewScanner(stdout)
-	scannerErr := bufio.NewScanner(stderr)
+	var wg sync.WaitGroup
 
-	// Read and print each line with the prefix
-	hookOutputPrefix := "  "
-	go func() {
-		for scanner.Scan() {
-			logger.Info("%s%s", hookOutputPrefix, scanner.Text())
-		}
-	}()
-
-	go func() {
-		for scannerErr.Scan() {
-			logger.Error(scannerErr.Text())
-		}
-	}()
+	// Print stdout and stderr
+	wg.Add(1)
+	go h.printStdout(stdout, &wg)
+	wg.Add(1)
+	go h.printStderr(stderr, &wg)
 
 	// Wait for the command to finish
 	if err := cmd.Wait(); err != nil {
-		return fmt.Errorf("%s hook execution failed: %w", s.Name, err)
+		return fmt.Errorf("%s hook execution failed: %w", h.Name, err)
 	}
 
+	// Wait for all goroutines to finish
+	wg.Wait()
+
 	return nil
+}
+
+func (h *Hook) printStdout(pipe io.Reader, wg *sync.WaitGroup) {
+	defer wg.Done()
+	scanner := bufio.NewScanner(pipe)
+
+	for scanner.Scan() {
+		logger.Info("%s%s", h.StdoutPrefix, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		logger.Error("Error reading stdout: %v", err)
+	}
+}
+
+func (h *Hook) printStderr(pipe io.Reader, wg *sync.WaitGroup) {
+	defer wg.Done()
+	scanner := bufio.NewScanner(pipe)
+
+	for scanner.Scan() {
+		logger.Error(scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		logger.Error("Error reading stderr: %v", err)
+	}
 }
