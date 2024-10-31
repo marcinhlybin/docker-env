@@ -67,26 +67,38 @@ func (h *Hook) executeCommand() error {
 		return fmt.Errorf("failed to get stderr pipe: %w", err)
 	}
 
-	// Start the command
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("failed to execute command: %w", err)
+	// Create fd 3 for warnings
+	warnRead, warnWrite, err := os.Pipe()
+	if err != nil {
+		return fmt.Errorf("failed to create pipe for warnings (fd 3): %w", err)
 	}
+
+	cmd.ExtraFiles = []*os.File{warnWrite}
 
 	var wg sync.WaitGroup
 
-	// Print stdout and stderr
-	wg.Add(1)
-	go h.printStdout(stdout, &wg)
-	wg.Add(1)
-	go h.printStderr(stderr, &wg)
-
-	// Wait for the command to finish
-	if err := cmd.Wait(); err != nil {
-		return fmt.Errorf("%s hook execution failed: %w", h.Name, err)
+	// Start the command
+	if err := cmd.Start(); err != nil {
+		warnWrite.Close()
+		return fmt.Errorf("failed to execute command: %w", err)
 	}
+
+	warnWrite.Close()
+
+	// Start reading stdout, stderr and fd 3
+	wg.Add(3)
+	go h.printStdout(stdout, &wg)
+	go h.printStderr(stderr, &wg)
+	go h.printWarn(warnRead, &wg)
 
 	// Wait for all goroutines to finish
 	wg.Wait()
+
+	// Wait for the command to finish
+	err = cmd.Wait()
+	if err != nil {
+		return fmt.Errorf("%s hook execution failed: %w", h.Name, err)
+	}
 
 	return nil
 }
@@ -112,5 +124,17 @@ func (h *Hook) printStderr(pipe io.Reader, wg *sync.WaitGroup) {
 	}
 	if err := scanner.Err(); err != nil {
 		logger.Error("Error reading stderr: %v", err)
+	}
+}
+
+func (h *Hook) printWarn(pipe io.Reader, wg *sync.WaitGroup) {
+	defer wg.Done()
+	scanner := bufio.NewScanner(pipe)
+
+	for scanner.Scan() {
+		logger.Warning(scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		logger.Error("Error reading warnings: %v", err)
 	}
 }
