@@ -26,6 +26,7 @@ type Config struct {
 	TerminalDefaultCommand string   `yaml:"terminal_default_command"`
 	VscodeDefaultService   string   `yaml:"vscode_default_service"`
 	VscodeDefaultDir       string   `yaml:"vscode_default_dir"`
+	VscodeVariant          string   `yaml:"vscode_variant"`
 	AwsLogin               bool     `yaml:"aws_login"`
 	AwsRegion              string   `yaml:"aws_region"`
 	AwsRepository          string   `yaml:"aws_repository"`
@@ -123,6 +124,7 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("Terminal default command:", c.TerminalDefaultCommand)
 	fmt.Println("VSCode default service:", c.VscodeDefaultService)
 	fmt.Println("VSCode default directory:", c.VscodeDefaultDir)
+	fmt.Println("VSCode variant:", c.VscodeVariant)
 	fmt.Println()
 	fmt.Println("Show executed commands:", c.ShowExecutedCommands)
 	return nil
