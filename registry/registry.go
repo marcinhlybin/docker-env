@@ -199,7 +199,7 @@ func (reg *DockerProjectRegistry) Code(p *project.Project, dir string) error {
 		return nil
 	}
 
-	variant := reg.Config.VscodeVariant
+	variant := reg.Config.VscodeBinary
 
 	return reg.dockerCmd.OpenCode(container, dir, variant)
 }

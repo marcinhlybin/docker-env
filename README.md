@@ -14,11 +14,10 @@ In short, docker-env abstracts common docker-compose tasks, allowing you to focu
 
 ## Key features
 
-* Project (or stack) per branch. Create a new environment automatically when switching branches.
-* Repository isolation: Prefix project by repository name, ensuring no conflicts between different repositories.
-* Sidecar containers: Optional services, like admin tools or background jobs, can be started as needed without starting by default.
-* Hooks: Customize pre-start, post-start, and post-stop behaviors with hooks.
-
+- Project (or stack) per branch. Create a new environment automatically when switching branches.
+- Repository isolation: Prefix project by repository name, ensuring no conflicts between different repositories.
+- Sidecar containers: Optional services, like admin tools or background jobs, can be started as needed without starting by default.
+- Hooks: Customize pre-start, post-start, and post-stop behaviors with hooks.
 
 ## Installing
 
@@ -229,14 +228,18 @@ terminal_default_command: /bin/bash
 vscode_default_service: app
 vscode_default_dir: /app
 
+# If you are using a different flavor of VSCode, for example Cursor
+# set the appropriate binary for the code command
+vscode_binary: code
+
 # Scripts to run before and after
-pre_start_hooks: 
+pre_start_hooks:
   - .docker-env/pre-start.sh
 
-post_start_hooks: 
+post_start_hooks:
   - .docker-env/post-start.sh
 
-post_stop_hooks: 
+post_stop_hooks:
   - .docker-env/post-stop.sh
 
 ```
@@ -244,9 +247,10 @@ post_stop_hooks:
 ## Hooks
 
 Supported hooks are:
-* pre-start
-* post-start
-* post-stop
+
+- pre-start
+- post-start
+- post-stop
 
 Arguments passed to the hooks are `PROJECT_NAME` and `SERVICE_NAME` as positional arguments.
 
@@ -257,10 +261,10 @@ SERVICE_NAME="$2"
 ```
 
 Sample hooks can be found in `.docker-env/` directory to:
-* Generate SSL certificates
-* Run ssh-agent
-* Check ports availability
 
+- Generate SSL certificates
+- Run ssh-agent
+- Check ports availability
 
 ## Troubleshooting
 
