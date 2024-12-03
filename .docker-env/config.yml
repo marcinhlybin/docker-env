@@ -42,6 +42,10 @@ terminal_default_command: /bin/bash
 vscode_default_service: app
 vscode_default_dir: /app
 
+# If you are using a different flavor of VSCode, for example Cursor
+# set the appropriate binary for the code command
+vscode_binary: code
+
 # Scripts to run before and after
 pre_start_hooks: 
   - .docker-env/pre-start.d/10-add-ssl-certificate-linux.sh
