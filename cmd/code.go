@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/app"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -28,15 +29,22 @@ Directory is optional. By default it will open the / directory.`,
 }
 
 func codeAction(c *cli.Context) error {
-	app, err := NewApp(c)
+	ctx, err := app.NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	p, reg := app.Project, app.Registry
-	logger.SetPrefix(app.Project.Name)
+	p, err := ctx.ActiveProject()
+	if err != nil {
+		return err
+	}
+	if p == nil {
+		return nil
+	}
+
+	logger.SetPrefix(p.Name)
 
 	dir := c.Args().First()
 
-	return reg.Code(p, dir)
+	return ctx.Registry.Code(p, dir)
 }

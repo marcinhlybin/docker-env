@@ -21,6 +21,7 @@ type Config struct {
 	ComposeProgress        string   `yaml:"compose_progress"`
 	ComposeDefaultProfile  string   `yaml:"compose_default_profile"`
 	ComposeSidecarProfile  string   `yaml:"compose_sidecar_profile"`
+	GitDefaultBranch       string   `yaml:"git_default_branch"`
 	EnvFiles               []string `yaml:"env_files"`
 	TerminalDefaultService string   `yaml:"terminal_default_service"`
 	TerminalDefaultCommand string   `yaml:"terminal_default_command"`
@@ -44,6 +45,7 @@ func NewConfig() *Config {
 		ComposeProgress:        "tty",
 		ComposeDefaultProfile:  "app",
 		ComposeSidecarProfile:  "sidecar",
+		GitDefaultBranch:       "master",
 		EnvFiles:               []string{},
 		TerminalDefaultService: "app",
 		TerminalDefaultCommand: "/bin/bash",
@@ -107,6 +109,8 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("Compose default profile:", c.ComposeDefaultProfile)
 	fmt.Println("Compose sidecar profile:", c.ComposeSidecarProfile)
 	fmt.Println()
+	fmt.Println("Git default branch:", c.GitDefaultBranch)
+	fmt.Println()
 	printList("Env files:", c.EnvFiles)
 	fmt.Println()
 	printList("Required vars:", c.RequiredVars)
@@ -128,6 +132,8 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("VSCode binary:", c.VscodeBinary)
 	fmt.Println()
 	fmt.Println("Show executed commands:", c.ShowExecutedCommands)
+	fmt.Println()
+
 	return nil
 }
 

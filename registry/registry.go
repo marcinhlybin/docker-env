@@ -57,6 +57,26 @@ func (reg *DockerProjectRegistry) ProjectExists(p *project.Project) (bool, error
 	return false, nil
 }
 
+func (reg *DockerProjectRegistry) ActiveProject() (*project.Project, error) {
+	includeStopped := false
+	projects, err := reg.fetchProjects(includeStopped)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(projects) > 1 {
+		logger.Warning("More than one project is running. Using the first one found.")
+	}
+
+	for _, proj := range projects {
+		if proj.IsRunning() {
+			return proj, nil
+		}
+	}
+
+	return nil, nil
+}
+
 func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, update bool) error {
 	// Login to AWS registry
 	if reg.Config.AwsLogin {

@@ -16,6 +16,9 @@ compose_file_override: docker-compose.override.yml
 compose_default_profile: app
 compose_sidecar_profile: sidecar
 
+# Git options
+git_default_branch: master
+
 # Debug options
 show_executed_commands: true
 

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/app"
 	"github.com/urfave/cli/v2"
 )
 
@@ -15,12 +16,12 @@ var InfoCommand = cli.Command{
 func infoAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	app, err := NewApp(c)
+	ctx, err := app.NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	cfg := app.Config
+	cfg := ctx.Config
 
 	return cfg.ShowConfig()
 }

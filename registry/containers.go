@@ -75,7 +75,7 @@ func (reg *DockerProjectRegistry) ListContainers(includeStopped bool) error {
 }
 
 func (reg *DockerProjectRegistry) fetchContainers(includeStopped bool) ([]docker.Container, error) {
-	logger.Debug("Fetching containers, includeStopped: %s", includeStopped)
+	logger.Debug("Fetching containers, includeStopped: %v", includeStopped)
 	dc := reg.dockerCmd.FetchAllContainersCommand(includeStopped)
 	jsonRecords, err := dc.ExecuteWithOutput()
 	if err != nil {

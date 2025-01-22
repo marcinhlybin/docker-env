@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/app"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -10,7 +11,7 @@ var RemoveCommand = cli.Command{
 	Aliases: []string{"rm", "delete"},
 	Usage:   "Remove docker containers",
 	Description: `Remove docker containers.
-If environment name is not specified current branch name is used.`,
+If project name is not specified, master branch is used.`,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "project",
@@ -29,13 +30,20 @@ If environment name is not specified current branch name is used.`,
 func removeAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	app, err := NewApp(c)
+	ctx, err := app.NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	p, reg := app.Project, app.Registry
+	p, err := ctx.ActiveProject()
+	if err != nil {
+		return err
+	}
+	if p == nil {
+		return nil
+	}
+
 	logger.SetPrefix(p.Name)
 
-	return reg.RemoveProject(p)
+	return ctx.Registry.RemoveProject(p)
 }

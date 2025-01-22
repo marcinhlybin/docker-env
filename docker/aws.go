@@ -8,6 +8,11 @@ import (
 )
 
 func (dc *DockerCmd) LoginAws() error {
+	// Check if the AWS CLI binary is available
+	if _, err := exec.LookPath("aws"); err != nil {
+		return fmt.Errorf("AWS CLI binary not found. Install with 'brew install awscli' or 'sudo apt-get install awscli'")
+	}
+
 	// Get the password from AWS command
 	awsCmd := exec.Command("aws", "ecr", "get-login-password", "--region", dc.Config.AwsRegion)
 	awsOutput, err := awsCmd.CombinedOutput()

@@ -51,7 +51,7 @@ USAGE:
    docker-env [global options] command [command options]
 
 VERSION:
-   1.0.0
+   2.0.0
 
 DESCRIPTION:
    All commands must run in the git repository directory of the project.
@@ -63,7 +63,7 @@ COMMANDS:
    restart, r, reboot          Restart docker containers
    remove, rm, delete          Remove docker containers
    ls, list, l, ll             List projects, 'll' to show containers.
-   cleanup                     Removes all projects
+   reset, cleanup              Removes all projects
    build, b                    Build docker images
    info, config, show          Show configuration
    terminal, term, shell, ssh  Run terminal
@@ -92,22 +92,27 @@ USAGE:
 
 DESCRIPTION:
    Start docker containers.
-   If project name is not specified, current branch name is used.
+   If project name is not specified, master branch is used.
    If project does not exist it will be created.
 
 OPTIONS:
-   --project value, -p value  set a project name
-   --service value, -s value  start a single service
-   --recreate, -r             recreate the containers (default: false)
-   --update, -u               update the images and recreate the containers (default: false)
-   --help, -h                 show help
+   --project value, -p value    set a project name
+   --branch, -b                 use current git branch as project name (default: false)
+   --service value, -s value    start a single service
+   --recreate, -r               recreate the containers (default: false)
+   --update, -u                 update the images and recreate the containers (default: false)
+   --no-hooks, --without-hooks  do not run pre/post start hooks (default: false)
+   --help, -h                   show help
 ```
 
 ## Sample commands
 
 ```
-# Create new environment based on branch name
+# Create new environment with default git branch (master)
 docker-env start
+
+# Create branch based environment
+docker-env start -b
 
 # Create new environment with custom name
 docker-env start -p db-fix
@@ -117,6 +122,9 @@ docker-env restart -p db-fix
 
 # Restart a single container
 docker-env restart -p db-fix -s app
+
+# Restart a single container from active environment
+docker-env restart -s postgresql
 
 # Recreate all containers
 docker-env start -r
@@ -131,7 +139,7 @@ docker-env start -u
 docker-env start -s app -u
 
 # Cleanup environments and images
-docker-env cleanup --with-images
+docker-env reset --hard
 
 # Run shell
 docker-env shell
@@ -202,6 +210,9 @@ compose_file_override: docker-compose.override.yml
 compose_default_profile: app
 compose_sidecar_profile: sidecar
 
+# Git options
+git_default_branch: master
+
 # Debug options
 show_executed_commands: true
 
@@ -234,13 +245,16 @@ vscode_binary: code
 
 # Scripts to run before and after
 pre_start_hooks:
-  - .docker-env/pre-start.sh
+  - .docker-env/pre-start.d/10-add-ssl-certificate-linux.sh
+  - .docker-env/pre-start.d/10-add-ssl-certificate-macos.sh
+  - .docker-env/pre-start.d/20-ports.sh
+  - .docker-env/pre-start.d/30-ssh-agent.sh
 
 post_start_hooks:
-  - .docker-env/post-start.sh
+  - .docker-env/post-start.d/10-show-message.sh
 
 post_stop_hooks:
-  - .docker-env/post-stop.sh
+  - .docker-env/post-stop.d/10-node-modules.sh
 
 ```
 

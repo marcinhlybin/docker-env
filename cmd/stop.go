@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/app"
+	"github.com/marcinhlybin/docker-env/hooks"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -10,7 +12,7 @@ var StopCommand = cli.Command{
 	Aliases: []string{"ss", "down"},
 	Usage:   "Stop docker containers",
 	Description: `Stop docker containers.
-If environment name is not specified current branch name is used.`,
+If project name is not specified master branch is used.`,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "project",
@@ -34,23 +36,30 @@ If environment name is not specified current branch name is used.`,
 func stopAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	app, err := NewApp(c)
+	ctx, err := app.NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	p, reg := app.Project, app.Registry
+	p, err := ctx.ActiveProject()
+	if err != nil {
+		return err
+	}
+	if p == nil {
+		return nil
+	}
+
 	logger.SetPrefix(p.Name)
 
 	// Stop the project
-	if err := reg.StopProject(p); err != nil {
+	if err := ctx.Registry.StopProject(p); err != nil {
 		return err
 	}
 
 	// Post-stop hooks
 	withHooks := !c.Bool("no-hooks")
 	if withHooks {
-		if err := app.RunPostStopHooks(); err != nil {
+		if err := hooks.RunPostStopHooks(p, ctx); err != nil {
 			return err
 		}
 	}

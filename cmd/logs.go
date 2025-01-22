@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/app"
 	"github.com/marcinhlybin/docker-env/docker"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
@@ -39,12 +40,19 @@ var LogsCommand = cli.Command{
 func logsAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	app, err := NewApp(c)
+	ctx, err := app.NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	p, reg := app.Project, app.Registry
+	p, err := ctx.ActiveProject()
+	if err != nil {
+		return err
+	}
+	if p == nil {
+		return nil
+	}
+
 	logger.SetPrefix(p.Name)
 
 	opts := docker.LogsOptions{
@@ -53,7 +61,7 @@ func logsAction(c *cli.Context) error {
 	}
 
 	// Show logs
-	if err := reg.Logs(p, opts); err != nil {
+	if err := ctx.Registry.Logs(p, opts); err != nil {
 		return err
 	}
 
