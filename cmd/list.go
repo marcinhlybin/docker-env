@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/app"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -28,21 +29,20 @@ var ListCommand = cli.Command{
 func listAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	app, err := NewApp(c)
+	ctx, err := app.NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	reg, cfg := app.Registry, app.Config
-	logger.SetPrefix(cfg.ComposeProjectName)
+	logger.SetPrefix(ctx.Config.ComposeProjectName)
 	logger.ShowExecutedCommands(false)
 
-	containers := c.Bool("containers") || isAliasUsed("ll")
+	containers := c.Bool("containers") || IsAliasUsed("ll")
 	includeStopped := !c.Bool("running")
 
 	if containers {
-		return reg.ListContainers(includeStopped)
+		return ctx.Registry.ListContainers(includeStopped)
 	}
 
-	return reg.ListProjects(includeStopped)
+	return ctx.Registry.ListProjects(includeStopped)
 }

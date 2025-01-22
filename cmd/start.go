@@ -1,6 +1,10 @@
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/marcinhlybin/docker-env/app"
+	"github.com/marcinhlybin/docker-env/hooks"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -10,13 +14,18 @@ var StartCommand = cli.Command{
 	Aliases: []string{"s", "up"},
 	Usage:   "Start docker containers",
 	Description: `Start docker containers.
-If project name is not specified, current branch name is used.
+If project name is not specified, master branch is used.
 If project does not exist it will be created.`,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "project",
 			Aliases: []string{"p"},
 			Usage:   "set a project name",
+		},
+		&cli.BoolFlag{
+			Name:    "branch",
+			Aliases: []string{"b"},
+			Usage:   "use current git branch as project name",
 		},
 		&cli.StringFlag{
 			Name:    "service",
@@ -45,38 +54,50 @@ If project does not exist it will be created.`,
 func startAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	app, err := NewApp(c)
+	// Mutually exclusive flags -p and -b
+	if c.IsSet("project") && c.IsSet("branch") {
+		return fmt.Errorf("flags -p and -b are mutually exclusive")
+	}
+
+	// Get the app context
+	ctx, err := app.NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	p, reg := app.Project, app.Registry
+	// Create a new project
+	p, err := ctx.CreateProject()
+	if err != nil {
+		return err
+	}
+
+	// Set logger
 	logger.SetPrefix(p.Name)
-	reg.UpdateProjectStatus(p)
 
-	recreate := c.Bool("recreate")
-	update := c.Bool("update")
-
-	if err := reg.StopOtherActiveProjects(p); err != nil {
+	// Stop other active projects
+	if err := ctx.Registry.StopOtherActiveProjects(p); err != nil {
 		return err
 	}
 
 	// Pre-start hooks
+	ctx.Registry.UpdateProjectStatus(p)
 	withHooks := !c.Bool("no-hooks")
 	if withHooks && !p.IsRunning() {
-		if err := app.RunPreStartHooks(); err != nil {
+		if err := hooks.RunPreStartHooks(p, ctx); err != nil {
 			return err
 		}
 	}
 
 	// Start the project
-	if err := reg.StartProject(p, recreate, update); err != nil {
+	recreate := c.Bool("recreate")
+	update := c.Bool("update")
+	if err := ctx.Registry.StartProject(p, recreate, update); err != nil {
 		return err
 	}
 
 	// Post-start hooks
 	if withHooks && !p.IsRunning() {
-		if err := app.RunPostStartHooks(); err != nil {
+		if err := hooks.RunPostStartHooks(p, ctx); err != nil {
 			return err
 		}
 	}

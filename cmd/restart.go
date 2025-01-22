@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/app"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -10,7 +11,7 @@ var RestartCommand = cli.Command{
 	Aliases: []string{"r", "reboot"},
 	Usage:   "Restart docker containers",
 	Description: `Restart docker containers.
-If environment name is not specified current branch name is used.`,
+If project name is not specified, master branch is used.`,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "project",
@@ -29,13 +30,21 @@ If environment name is not specified current branch name is used.`,
 func restartAction(c *cli.Context) error {
 	ExitWithErrorOnArgs(c)
 
-	app, err := NewApp(c)
+	ctx, err := app.NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	p, reg := app.Project, app.Registry
+	p, err := ctx.ActiveProject()
+	if err != nil {
+		return err
+	}
+	if p == nil {
+		return nil
+	}
+
 	logger.SetPrefix(p.Name)
 
+	reg := ctx.Registry
 	return reg.RestartProject(p)
 }

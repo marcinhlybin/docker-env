@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/marcinhlybin/docker-env/app"
 	"github.com/marcinhlybin/docker-env/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -27,15 +28,21 @@ var TerminalCommand = cli.Command{
 }
 
 func terminalAction(c *cli.Context) error {
-	app, err := NewApp(c)
+	ctx, err := app.NewAppContext(c)
 	if err != nil {
 		return err
 	}
 
-	p, reg := app.Project, app.Registry
+	p, err := ctx.ActiveProject()
+	if err != nil {
+		return err
+	}
+	if p == nil {
+		return nil
+	}
+
 	logger.SetPrefix(p.Name)
 
 	cmd := c.Args().Slice()
-
-	return reg.Terminal(p, cmd)
+	return ctx.Registry.Terminal(p, cmd)
 }

@@ -14,7 +14,7 @@ func ExitWithErrorOnArgs(c *cli.Context) {
 	}
 }
 
-func isAliasUsed(alias string) bool {
+func IsAliasUsed(alias string) bool {
 	for _, arg := range os.Args {
 		if strings.Contains(arg, alias) {
 			return true
