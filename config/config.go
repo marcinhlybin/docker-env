@@ -31,6 +31,8 @@ type Config struct {
 	AwsLogin               bool     `yaml:"aws_login"`
 	AwsRegion              string   `yaml:"aws_region"`
 	AwsRepository          string   `yaml:"aws_repository"`
+	AwsMfa                 bool     `yaml:"aws_mfa"`
+	AwsMfaDurationSeconds  int      `yaml:"aws_mfa_duration_seconds"`
 	PreStartHooks          []string `yaml:"pre_start_hooks"`
 	PostStartHooks         []string `yaml:"post_start_hooks"`
 	PostStopHooks          []string `yaml:"post_stop_hooks"`
@@ -57,6 +59,9 @@ func NewConfig() *Config {
 		PostStopHooks:          []string{},
 		RequiredVars:           []string{},
 		ShowExecutedCommands:   true,
+		AwsLogin:               false,
+		AwsMfa:                 false,
+		AwsMfaDurationSeconds:  3600,
 	}
 }
 
@@ -124,6 +129,8 @@ func (c *Config) ShowConfig() error {
 	fmt.Println("AWS login:", c.AwsLogin)
 	fmt.Println("AWS region:", c.AwsRegion)
 	fmt.Println("AWS repository:", c.AwsRepository)
+	fmt.Println("AWS MFA:", c.AwsMfa)
+	fmt.Println("AWS MFA duration seconds:", c.AwsMfaDurationSeconds)
 	fmt.Println()
 	fmt.Println("Terminal default service:", c.TerminalDefaultService)
 	fmt.Println("Terminal default command:", c.TerminalDefaultCommand)

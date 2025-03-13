@@ -225,13 +225,19 @@ env_files:
 required_vars:
   - GITHUB_USER
   - GITHUB_TOKEN
-  - AWS_ACCESS_KEY_ID
-  - AWS_SECRET_ACCESS_KEY
+  - AWS_PROFILE
+  - AWS_MFA_SERIAL
 
 # AWS registry
 aws_login: false
 aws_region: eu-central-1
 aws_repository: 1234567890.dkr.ecr.eu-central-1.amazonaws.com
+
+# Use MFA (multi-factor authentication) for AWS login
+# Requires AWS_MFA_SERIAL environment variable to be set in the .env file
+# Sample value: arn:aws:iam::1234567890:mfa/User123
+aws_mfa: false
+aws_mfa_duration_seconds: 3600 # 1 hour
 
 # Command defaults
 terminal_default_service: app
