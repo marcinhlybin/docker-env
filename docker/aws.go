@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
+	"github.com/marcinhlybin/docker-env/logger"
 )
 
 type STSCredentials struct {
@@ -108,11 +109,12 @@ func promptMfaToken() (string, error) {
 }
 
 func stsCredentials(mfaSerial, mfaToken string, durationSeconds int) (STSCredentials, error) {
-	stsCmd := exec.Command("aws", "sts", "get-session-token",
+	cmd := exec.Command("aws", "sts", "get-session-token",
 		"--serial-number", mfaSerial,
 		"--token-code", mfaToken,
 		"--duration-seconds", fmt.Sprintf("%d", durationSeconds))
-	stsOutput, err := stsCmd.CombinedOutput()
+	logger.Execute(cmd.String())
+	stsOutput, err := cmd.CombinedOutput()
 	if err != nil {
 		return STSCredentials{}, fmt.Errorf("error getting AWS STS session token: %v", strings.TrimSpace(string(stsOutput)))
 	}
@@ -128,7 +130,7 @@ func stsCredentials(mfaSerial, mfaToken string, durationSeconds int) (STSCredent
 func getEcrLoginPassword(env []string, region string) (string, error) {
 	cmd := exec.Command("aws", "ecr", "get-login-password", "--region", region)
 	cmd.Env = env
-
+	logger.Execute(cmd.String())
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("error getting AWS registry password: %v\nOutput: %s",
@@ -139,13 +141,13 @@ func getEcrLoginPassword(env []string, region string) (string, error) {
 }
 
 func dockerLogin(password, repository string) error {
-	loginCmd := exec.Command("docker", "login",
+	cmd := exec.Command("docker", "login",
 		"--username", "AWS",
 		"--password-stdin", repository,
 	)
-	loginCmd.Stdin = bytes.NewReader([]byte(password))
-
-	if err := loginCmd.Run(); err != nil {
+	cmd.Stdin = bytes.NewReader([]byte(password))
+	logger.Execute(cmd.String())
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("error running docker login: %v", err)
 	}
 	return nil
