@@ -79,7 +79,7 @@ func (reg *DockerProjectRegistry) ActiveProject() (*project.Project, error) {
 
 func (reg *DockerProjectRegistry) StartProject(p *project.Project, recreate, update bool) error {
 	// Login to AWS registry
-	if reg.Config.AwsLogin {
+	if update && reg.Config.AwsLogin {
 		logger.Info("Logging into AWS registry")
 		if err := reg.dockerCmd.LoginAws(); err != nil {
 			return err
